@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Mini Orienteer</title>
+  <title>Tindra Lost</title>
   <style>
     body {
       font-family: sans-serif;
@@ -22,7 +22,7 @@
   <h1>Mini Orienteer</h1>
   <div id="info">Time: <span id="timer">0.0</span> s | Checkpoints: <span id="score">0</span></div>
   <canvas id="game" width="400" height="400"></canvas>
-  <canvas id="minimap" width="200" height="200" style="display:none; position:absolute; top:10px; right:10px; border:1px solid #333;"></canvas>
+  <canvas id="minimap" width="400" height="400" style="display:none; position:absolute; top:10px; right:10px; border:1px solid #333;"></canvas>
 
   <script>
     const canvas = document.getElementById('game');
@@ -33,6 +33,7 @@
 	const minimapCtx = minimapCanvas.getContext('2d');
 	let minimapVisible = false;
 
+    let startPosition = { x: 0, y: 0 }; // Declared early to avoid ReferenceError
 
     const tileSize = 40;
     const chunkSize = 10;
@@ -57,7 +58,30 @@
     };
 
     let terrainChunks = new Map();
-    let checkpoints = [];
+	let checkpoints = [];
+	
+    function generateRandomCheckpoints() {
+      const count = Math.floor(Math.random() * 3) + 6; // 6 to 8
+      checkpoints = [];
+      const used = new Set();
+      while (checkpoints.length < count) {
+        const x = Math.floor(Math.random() * 30);
+        const y = Math.floor(Math.random() * 30);
+        const key = `${x},${y}`;
+        if (!used.has(key)) {
+          // Ensure chunk is generated
+          const cx = Math.floor(x / chunkSize);
+          const cy = Math.floor(y / chunkSize);
+          generateChunk(cx, cy);
+
+          const tile = getTile(x, y);
+          if (impassableTiles.includes(tile)) continue; // Avoid invalid tiles
+
+          used.add(key);
+          checkpoints.push({ x, y, found: false });
+        }
+      }
+    }
 
     function generateChunk(cx, cy) {
       const key = `${cx},${cy}`;
@@ -76,12 +100,6 @@
         chunk.push(row);
       }
       terrainChunks.set(key, chunk);
-
-      if (Math.random() < 0.3) {
-        const cpX = cx * chunkSize + Math.floor(Math.random() * chunkSize);
-        const cpY = cy * chunkSize + Math.floor(Math.random() * chunkSize);
-        checkpoints.push({ x: cpX, y: cpY, found: false });
-      }
     }
 
     function getTile(x, y) {
@@ -100,13 +118,13 @@
       angle: 0
     };
 
-    const baseSpeed = 2.0;
+    const baseSpeed = 4.0;
     const turnSpeed = 0.05;
     let keys = {};
     let score = 0;
     let startTime = null;
     let gameOver = false;
-
+	
     function drawWorld() {
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -154,7 +172,7 @@
       ctx.stroke();
     }
 
-        function drawFlashlight() {
+    function drawFlashlight() {
       const lightRadius = 200;
       const beamAngle = 2 * Math.PI / 3;
       const px = canvas.width / 2;
@@ -207,7 +225,7 @@
 
         if (darkTiles.includes(tile)) return d;
         if (semiDarkTiles.includes(tile)) {
-          accumulatedOpacity += 0.5; // block 50%
+          accumulatedOpacity += 0.5;
           if (accumulatedOpacity >= 1) return d;
         }
       }
@@ -246,22 +264,24 @@
         player.x = nextX;
         player.y = nextY;
       }
+	  
+		const nextCheckpoint = checkpoints.find(cp => !cp.found);
+		if (nextCheckpoint) {
+		  const cx = nextCheckpoint.x * tileSize + tileSize / 2;
+		  const cy = nextCheckpoint.y * tileSize + tileSize / 2;
+		  const dist = Math.hypot(player.x - cx, player.y - cy);
+		  if (dist < tileSize / 2) {
+			nextCheckpoint.found = true;
+			score++;
+			scoreDisplay.textContent = score;
+		  }
+		}
 
-      checkpoints.forEach(cp => {
-        const cx = cp.x * tileSize + tileSize / 2;
-        const cy = cp.y * tileSize + tileSize / 2;
-        const dist = Math.hypot(player.x - cx, player.y - cy);
-        if (!cp.found && dist < tileSize / 2) {
-          cp.found = true;
-          score++;
-          scoreDisplay.textContent = score;
-        }
-      });
     }
-	
+
 	function drawMinimap() {
 		minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
-		const scale = 4;
+		const scale = 8; // 2x size tiles
 		const halfW = minimapCanvas.width / 2;
 		const halfH = minimapCanvas.height / 2;
 
@@ -284,28 +304,33 @@
 		  }
 		}
 
-		checkpoints.forEach(cp => {
-		  const dx = cp.x - mapCenterX;
-		  const dy = cp.y - mapCenterY;
+		checkpoints.forEach((cp, index) => {
 		  if (!cp.found) {
-			minimapCtx.fillStyle = 'red';
-			minimapCtx.fillRect(
-			  halfW + dx * scale,
-			  halfH + dy * scale,
-			  scale, scale
-			);
+			const dx = cp.x - mapCenterX;
+			const dy = cp.y - mapCenterY;
+			const px = halfW + dx * scale;
+			const py = halfH + dy * scale;
+			minimapCtx.strokeStyle = 'purple';
+			minimapCtx.lineWidth = 2;
+			minimapCtx.beginPath();
+			minimapCtx.arc(px, py, 10, 0, Math.PI * 2);
+			minimapCtx.stroke();
+			minimapCtx.fillStyle = 'purple';
+			minimapCtx.font = 'bold 12px sans-serif';
+			minimapCtx.fillText((index + 1).toString(), px - 4, py + 4);
 		  }
 		});
 
-		// Draw player start position as triangle
-		minimapCtx.fillStyle = 'blue';
+		// Draw player start position as hollow purple triangle
+		minimapCtx.strokeStyle = 'purple';
+		minimapCtx.lineWidth = 2;
 		minimapCtx.beginPath();
-		minimapCtx.moveTo(halfW, halfH - 4);
-		minimapCtx.lineTo(halfW - 3, halfH + 3);
-		minimapCtx.lineTo(halfW + 3, halfH + 3);
+		minimapCtx.moveTo(halfW, halfH - 20);
+		minimapCtx.lineTo(halfW - 15, halfH + 15);
+		minimapCtx.lineTo(halfW + 15, halfH + 15);
 		minimapCtx.closePath();
-		minimapCtx.fill();
-	  }
+		minimapCtx.stroke();
+	}
 
     document.addEventListener('keydown', (e) => keys[e.key] = true);
     document.addEventListener('keyup', (e) => keys[e.key] = false);
@@ -316,7 +341,6 @@
 		minimapCanvas.style.display = minimapVisible ? 'block' : 'none';
 	}
 	});
-
 	document.addEventListener('keyup', (e) => keys[e.key] = false);
 
   function gameLoop() {
@@ -329,9 +353,10 @@
       requestAnimationFrame(gameLoop);
     }
   }
-  
+
   window.onload = () => {
     startPosition = { x: player.x, y: player.y };
+	generateRandomCheckpoints();
   }
 
     generateChunk(0, 0);
