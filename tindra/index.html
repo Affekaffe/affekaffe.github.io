@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Orienteer</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #e0f7fa;
+    }
+    canvas {
+      border: 2px solid #333;
+      background: #fff;
+    }
+    #info {
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Mini Orienteer</h1>
+  <div id="info">Time: <span id="timer">0.0</span> s | Checkpoints: <span id="score">0</span>/3</div>
+  <canvas id="game" width="400" height="400"></canvas>
+
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const timerDisplay = document.getElementById('timer');
+    const scoreDisplay = document.getElementById('score');
+
+    const tileSize = 40;
+    const cols = 10;
+    const rows = 10;
+
+    const map = Array.from({ length: rows }, () => Array(cols).fill(0));
+    const checkpoints = [
+      { x: 2, y: 3, found: false },
+      { x: 7, y: 6, found: false },
+      { x: 4, y: 1, found: false },
+    ];
+
+    let player = { x: 0, y: 0 };
+    let score = 0;
+    let startTime = null;
+    let gameOver = false;
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw grid
+      ctx.strokeStyle = '#bbb';
+      for (let i = 0; i <= cols; i++) {
+        ctx.beginPath();
+        ctx.moveTo(i * tileSize, 0);
+        ctx.lineTo(i * tileSize, rows * tileSize);
+        ctx.stroke();
+      }
+      for (let j = 0; j <= rows; j++) {
+        ctx.beginPath();
+        ctx.moveTo(0, j * tileSize);
+        ctx.lineTo(cols * tileSize, j * tileSize);
+        ctx.stroke();
+      }
+
+      // Draw checkpoints
+      checkpoints.forEach(cp => {
+        if (!cp.found) {
+          ctx.fillStyle = 'red';
+          ctx.beginPath();
+          ctx.arc(
+            cp.x * tileSize + tileSize / 2,
+            cp.y * tileSize + tileSize / 2,
+            tileSize / 4,
+            0,
+            Math.PI * 2
+          );
+          ctx.fill();
+        }
+      });
+
+      // Draw player
+      ctx.fillStyle = 'blue';
+      ctx.fillRect(
+        player.x * tileSize + 5,
+        player.y * tileSize + 5,
+        tileSize - 10,
+        tileSize - 10
+      );
+    }
+
+    function update() {
+      if (!startTime) startTime = Date.now();
+      const elapsed = (Date.now() - startTime) / 1000;
+      timerDisplay.textContent = elapsed.toFixed(1);
+
+      checkpoints.forEach(cp => {
+        if (!cp.found && cp.x === player.x && cp.y === player.y) {
+          cp.found = true;
+          score++;
+          scoreDisplay.textContent = score;
+          if (score === checkpoints.length) {
+            gameOver = true;
+            alert(`You found all checkpoints in ${elapsed.toFixed(1)} seconds!`);
+          }
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (gameOver) return;
+      if (e.key === 'ArrowUp' && player.y > 0) player.y--;
+      if (e.key === 'ArrowDown' && player.y < rows - 1) player.y++;
+      if (e.key === 'ArrowLeft' && player.x > 0) player.x--;
+      if (e.key === 'ArrowRight' && player.x < cols - 1) player.x++;
+      update();
+      draw();
+    });
+
+    draw();
+  </script>
+</body>
+</html>
