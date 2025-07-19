@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Mini Orienteer</title>
+  <title>Tindra Lost</title>
   <style>
     body {
       font-family: sans-serif;
@@ -20,73 +20,199 @@
 </head>
 <body>
   <h1>Mini Orienteer</h1>
-  <div id="info">Time: <span id="timer">0.0</span> s | Checkpoints: <span id="score">0</span>/3</div>
+  <div id="info">Time: <span id="timer">0.0</span> s | Checkpoints: <span id="score">0</span></div>
   <canvas id="game" width="400" height="400"></canvas>
+  <canvas id="minimap" width="200" height="200" style="display:none; position:absolute; top:10px; right:10px; border:1px solid #333;"></canvas>
 
   <script>
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
     const timerDisplay = document.getElementById('timer');
     const scoreDisplay = document.getElementById('score');
+	const minimapCanvas = document.getElementById('minimap');
+	const minimapCtx = minimapCanvas.getContext('2d');
+	let minimapVisible = false;
+
+    let startPosition = { x: 0, y: 0 }; // Declared early to avoid ReferenceError
 
     const tileSize = 40;
-    const cols = 10;
-    const rows = 10;
+    const chunkSize = 10;
 
-    const map = Array.from({ length: rows }, () => Array(cols).fill(0));
-    const checkpoints = [
-      { x: 2, y: 3, found: false },
-      { x: 7, y: 6, found: false },
-      { x: 4, y: 1, found: false },
-    ];
+    const colorMap = {
+      '.': '#ccffcc', //
+      'T': '#228B22', //Dense Vegetation
+      '~': '#87ceeb', //Water
+      '#': '#ff69b4', //Open
+      'X': '#444', //Building
+    };
 
-    let player = { x: 0, y: 0 };
+    const impassableTiles = ['~', 'X'];
+    const darkTiles = ['X']; // Only buildings block light fully
+
+    const semiDarkTiles = ['T']; // Dense vegetation blocks light 50%
+
+    const speedModifiers = {
+      '.': 1.0,
+      'T': 0.4,
+      '#': 1.5,
+    };
+
+    let terrainChunks = new Map();
+    let checkpoints = [];
+
+    function generateChunk(cx, cy) {
+      const key = `${cx},${cy}`;
+      if (terrainChunks.has(key)) return;
+      const chunk = [];
+      for (let y = 0; y < chunkSize; y++) {
+        const row = [];
+        for (let x = 0; x < chunkSize; x++) {
+          const r = Math.random();
+          if (r < 0.05) row.push('~');
+          else if (r < 0.1) row.push('X');
+          else if (r < 0.25) row.push('T');
+          else if (r < 0.3) row.push('#');
+          else row.push('.');
+        }
+        chunk.push(row);
+      }
+      terrainChunks.set(key, chunk);
+
+      if (Math.random() < 0.3) {
+        const cpX = cx * chunkSize + Math.floor(Math.random() * chunkSize);
+        const cpY = cy * chunkSize + Math.floor(Math.random() * chunkSize);
+        checkpoints.push({ x: cpX, y: cpY, found: false });
+      }
+    }
+
+    function getTile(x, y) {
+      const cx = Math.floor(x / chunkSize);
+      const cy = Math.floor(y / chunkSize);
+      generateChunk(cx, cy);
+      const chunk = terrainChunks.get(`${cx},${cy}`);
+      const tx = ((x % chunkSize) + chunkSize) % chunkSize;
+      const ty = ((y % chunkSize) + chunkSize) % chunkSize;
+      return chunk[ty][tx];
+    }
+
+    let player = {
+      x: 0,
+      y: 0,
+      angle: 0
+    };
+
+    const baseSpeed = 4.0;
+    const turnSpeed = 0.05;
+    let keys = {};
     let score = 0;
     let startTime = null;
     let gameOver = false;
 
-    function draw() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function drawWorld() {
+      ctx.save();
+      ctx.translate(canvas.width / 2, canvas.height / 2);
+      ctx.rotate(-player.angle);
+      ctx.translate(-player.x, -player.y);
 
-      // Draw grid
-      ctx.strokeStyle = '#bbb';
-      for (let i = 0; i <= cols; i++) {
-        ctx.beginPath();
-        ctx.moveTo(i * tileSize, 0);
-        ctx.lineTo(i * tileSize, rows * tileSize);
-        ctx.stroke();
-      }
-      for (let j = 0; j <= rows; j++) {
-        ctx.beginPath();
-        ctx.moveTo(0, j * tileSize);
-        ctx.lineTo(cols * tileSize, j * tileSize);
-        ctx.stroke();
+      const minX = Math.floor((player.x - canvas.width / 2) / tileSize) - 1;
+      const maxX = Math.floor((player.x + canvas.width / 2) / tileSize) + 1;
+      const minY = Math.floor((player.y - canvas.height / 2) / tileSize) - 1;
+      const maxY = Math.floor((player.y + canvas.height / 2) / tileSize) + 1;
+
+      for (let y = minY; y <= maxY; y++) {
+        for (let x = minX; x <= maxX; x++) {
+          const tile = getTile(x, y);
+          ctx.fillStyle = colorMap[tile] || '#ffffff';
+          const centerX = x * tileSize + tileSize / 2;
+          const centerY = y * tileSize + tileSize / 2;
+          ctx.fillRect(centerX - tileSize * 0.55, centerY - tileSize * 0.55, tileSize * 1.1, tileSize * 1.1);
+        }
       }
 
-      // Draw checkpoints
       checkpoints.forEach(cp => {
         if (!cp.found) {
           ctx.fillStyle = 'red';
           ctx.beginPath();
-          ctx.arc(
-            cp.x * tileSize + tileSize / 2,
-            cp.y * tileSize + tileSize / 2,
-            tileSize / 4,
-            0,
-            Math.PI * 2
-          );
+          ctx.arc(cp.x * tileSize + tileSize / 2, cp.y * tileSize + tileSize / 2, tileSize / 4, 0, Math.PI * 2);
           ctx.fill();
         }
       });
 
-      // Draw player
+      ctx.restore();
+
       ctx.fillStyle = 'blue';
-      ctx.fillRect(
-        player.x * tileSize + 5,
-        player.y * tileSize + 5,
-        tileSize - 10,
-        tileSize - 10
+      ctx.beginPath();
+      ctx.arc(canvas.width / 2, canvas.height / 2, tileSize / 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = 'black';
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2, canvas.height / 2);
+      ctx.lineTo(
+        canvas.width / 2 + Math.cos(player.angle) * 20,
+        canvas.height / 2 + Math.sin(player.angle) * 20
       );
+      ctx.stroke();
+    }
+
+    function drawFlashlight() {
+      const lightRadius = 200;
+      const beamAngle = 2 * Math.PI / 3;
+      const px = canvas.width / 2;
+      const py = canvas.height / 2;
+
+      const gradient = ctx.createRadialGradient(px, py, 0, px, py, lightRadius);
+      gradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
+      gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
+
+      const maskCanvas = document.createElement('canvas');
+      maskCanvas.width = canvas.width;
+      maskCanvas.height = canvas.height;
+      const maskCtx = maskCanvas.getContext('2d');
+
+      maskCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+      maskCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+      maskCtx.globalCompositeOperation = 'destination-out';
+      maskCtx.beginPath();
+      maskCtx.moveTo(px, py);
+
+      for (let a = -beamAngle / 2; a <= beamAngle / 2; a += 0.03) {
+        const screenAngle = -Math.PI / 2 + a;
+        const worldAngle = screenAngle + player.angle;
+        const dist = castRayWorld(worldAngle, lightRadius);
+        const rx = px + Math.cos(screenAngle) * dist;
+        const ry = py + Math.sin(screenAngle) * dist;
+        maskCtx.lineTo(rx, ry);
+      }
+
+      maskCtx.closePath();
+      maskCtx.fill();
+
+      maskCtx.globalCompositeOperation = 'hue';
+      maskCtx.fillStyle = gradient;
+      maskCtx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.drawImage(maskCanvas, 0, 0);
+    }
+
+    function castRayWorld(angle, maxDist) {
+      const step = 4;
+      let accumulatedOpacity = 0;
+      for (let d = 0; d < maxDist; d += step) {
+        const wx = player.x + Math.cos(angle) * d;
+        const wy = player.y + Math.sin(angle) * d;
+        const tileX = Math.floor(wx / tileSize);
+        const tileY = Math.floor(wy / tileSize);
+        const tile = getTile(tileX, tileY);
+
+        if (darkTiles.includes(tile)) return d;
+        if (semiDarkTiles.includes(tile)) {
+          accumulatedOpacity += 0.5;
+          if (accumulatedOpacity >= 1) return d;
+        }
+      }
+      return maxDist;
     }
 
     function update() {
@@ -94,30 +220,123 @@
       const elapsed = (Date.now() - startTime) / 1000;
       timerDisplay.textContent = elapsed.toFixed(1);
 
+      if (keys['ArrowLeft']) player.angle -= turnSpeed;
+      if (keys['ArrowRight']) player.angle += turnSpeed;
+
+      let dx = 0, dy = 0;
+      let currentTile = getTile(Math.floor(player.x / tileSize), Math.floor(player.y / tileSize));
+      let modifier = speedModifiers[currentTile] || 1.0;
+      const actualSpeed = baseSpeed * modifier;
+
+      if (keys['ArrowUp']) {
+        dx = Math.cos(player.angle - Math.PI / 2) * actualSpeed;
+        dy = Math.sin(player.angle - Math.PI / 2) * actualSpeed;
+      }
+      if (keys['ArrowDown']) {
+        dx = -Math.cos(player.angle - Math.PI / 2) * actualSpeed;
+        dy = -Math.sin(player.angle - Math.PI / 2) * actualSpeed;
+      }
+
+      const nextX = player.x + dx;
+      const nextY = player.y + dy;
+      const tileX = Math.floor(nextX / tileSize);
+      const tileY = Math.floor(nextY / tileSize);
+      const tile = getTile(tileX, tileY);
+
+      if (!impassableTiles.includes(tile)) {
+        player.x = nextX;
+        player.y = nextY;
+      }
+
       checkpoints.forEach(cp => {
-        if (!cp.found && cp.x === player.x && cp.y === player.y) {
+        const cx = cp.x * tileSize + tileSize / 2;
+        const cy = cp.y * tileSize + tileSize / 2;
+        const dist = Math.hypot(player.x - cx, player.y - cy);
+        if (!cp.found && dist < tileSize / 2) {
           cp.found = true;
           score++;
           scoreDisplay.textContent = score;
-          if (score === checkpoints.length) {
-            gameOver = true;
-            alert(`You found all checkpoints in ${elapsed.toFixed(1)} seconds!`);
-          }
         }
       });
     }
 
-    document.addEventListener('keydown', (e) => {
-      if (gameOver) return;
-      if (e.key === 'ArrowUp' && player.y > 0) player.y--;
-      if (e.key === 'ArrowDown' && player.y < rows - 1) player.y++;
-      if (e.key === 'ArrowLeft' && player.x > 0) player.x--;
-      if (e.key === 'ArrowRight' && player.x < cols - 1) player.x++;
-      update();
-      draw();
-    });
+	function drawMinimap() {
+		minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+		const scale = 4;
+		const halfW = minimapCanvas.width / 2;
+		const halfH = minimapCanvas.height / 2;
 
-    draw();
+		const mapCenterX = startPosition.x / tileSize;
+		const mapCenterY = startPosition.y / tileSize;
+
+		for (let dy = -25; dy <= 25; dy++) {
+		  for (let dx = -25; dx <= 25; dx++) {
+			const tx = Math.floor(mapCenterX + dx);
+			const ty = Math.floor(mapCenterY + dy);
+			const tile = getTile(tx, ty);
+			const color = colorMap[tile] || '#fff';
+			minimapCtx.fillStyle = color;
+			minimapCtx.fillRect(
+			  halfW + dx * scale,
+			  halfH + dy * scale,
+			  scale,
+			  scale
+			);
+		  }
+		}
+
+		checkpoints.forEach(cp => {
+		  const dx = cp.x - mapCenterX;
+		  const dy = cp.y - mapCenterY;
+		  if (!cp.found) {
+			minimapCtx.fillStyle = 'red';
+			minimapCtx.fillRect(
+			  halfW + dx * scale,
+			  halfH + dy * scale,
+			  scale, scale
+			);
+		  }
+		});
+
+		// Draw player start position as triangle
+		minimapCtx.fillStyle = 'blue';
+		minimapCtx.beginPath();
+		minimapCtx.moveTo(halfW, halfH - 4);
+		minimapCtx.lineTo(halfW - 3, halfH + 3);
+		minimapCtx.lineTo(halfW + 3, halfH + 3);
+		minimapCtx.closePath();
+		minimapCtx.fill();
+	  }
+
+    document.addEventListener('keydown', (e) => keys[e.key] = true);
+    document.addEventListener('keyup', (e) => keys[e.key] = false);
+	document.addEventListener('keydown', (e) => {
+	keys[e.key] = true;
+	if (e.key === 'm' || e.key === 'M') {
+		minimapVisible = !minimapVisible;
+		minimapCanvas.style.display = minimapVisible ? 'block' : 'none';
+	}
+	});
+	document.addEventListener('keyup', (e) => keys[e.key] = false);
+
+  function gameLoop() {
+    if (!gameOver) {
+      if (!minimapVisible) update();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawWorld();
+      drawFlashlight();
+      if (minimapVisible) drawMinimap();
+      requestAnimationFrame(gameLoop);
+    }
+  }
+
+  window.onload = () => {
+    startPosition = { x: player.x, y: player.y };
+  }
+
+    generateChunk(0, 0);
+    drawWorld();
+    gameLoop();
   </script>
 </body>
 </html>
