@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <title>Tindra Lost</title>
   <style>
+      @media (max-width: 768px) {
+      #mobile-controls {
+        display: flex !important;
+      }
+
+      canvas#game {
+        touch-action: none; /* Prevent pinch-zoom etc. */
+      }
+    }
     body {
       font-family: sans-serif;
       text-align: center;
@@ -16,11 +25,57 @@
     #info {
       margin: 10px;
     }
+    #mobile-controls {
+      position: absolute;
+      bottom: 20px;
+      left: 20px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #joystick-base {
+      width: 100px;
+      height: 100px;
+      background: rgba(100, 100, 100, 0.3);
+      border-radius: 50%;
+      position: relative;
+      touch-action: none;
+      mask-image: linear-gradient(to top, transparent 50%, black 50%);
+      -webkit-mask-image: linear-gradient(to top, transparent 30%, black 50%);
+    }
+
+    #joystick-thumb {
+      width: 40px;
+      height: 40px;
+      background: rgba(50, 50, 200, 0.7);
+      border-radius: 50%;
+      position: absolute;
+      left: 30px;
+      top: 30px;
+      touch-action: none;
+    }
+
+    #map-toggle {
+      padding: 10px 15px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      background-color: #333;
+      color: white;
+    }
   </style>
 </head>
 <body>
   <h1>Tindra Lost</h1>
   <div id="info">Time: <span id="timer">0.0</span> s | Checkpoints: <span id="score">0</span></div>
+  <div id="mobile-controls" style="display: none;">
+    <div id="joystick-base">
+      <div id="joystick-thumb"></div>
+    </div>
+    <button id="map-toggle">Map</button>
+  </div>
   <canvas id="game" width="400" height="400"></canvas>
   <canvas id="minimap" width="400" height="400" style="display:none; position:absolute; top:10px; right:10px; border:1px solid #333;"></canvas>
 
@@ -33,17 +88,19 @@
 	const minimapCtx = minimapCanvas.getContext('2d');
 	let minimapVisible = false;
 
-    let startPosition = { x: 0, y: 0 }; // Declared early to avoid ReferenceError
+    let startPosition = { x: Math.random() * 15, y: Math.random() * 15 }; // Declared early to avoid ReferenceError
+    let startAngle = Math.random() * 6
 
     const tileSize = 40;
-    const chunkSize = 10;
+    const chunkSize = 10; //tiles
+    const mapSize = 30; //tiles
 
     const colorMap = {
       '.': '#ccffcc', //
-      'T': '#228B22', //Dense Vegetation
-      '~': '#87ceeb', //Water
-      '#': '#ff69b4', //Open
-      'X': '#444', //Building
+      'T': '#85FF66', //Dense Vegetation
+      '~': '#00FFFF', //Water
+      '#': '#FFBA36', //Open
+      'X': '#222', //Building
     };
 
     const impassableTiles = ['~', 'X'];
@@ -65,8 +122,8 @@
       checkpoints = [];
       const used = new Set();
       while (checkpoints.length < count) {
-        const x = Math.floor(Math.random() * 30);
-        const y = Math.floor(Math.random() * 30);
+        const x = Math.floor((Math.random() - 0.5) * mapSize);
+        const y = Math.floor((Math.random() - 0.5) * mapSize);
         const key = `${x},${y}`;
         if (!used.has(key)) {
           // Ensure chunk is generated
@@ -76,6 +133,19 @@
 
           const tile = getTile(x, y);
           if (impassableTiles.includes(tile)) continue; // Avoid invalid tiles
+
+          const minDistance = 6; // in tiles
+          let tooClose = false;
+          for (const cp of checkpoints) {
+            const dx = cp.x - x;
+            const dy = cp.y - y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < minDistance) {
+              tooClose = true;
+              break;
+            }
+          }
+          if (tooClose) continue;
 
           used.add(key);
           checkpoints.push({ x, y, found: false });
@@ -113,18 +183,22 @@
     }
 
     let player = {
-      x: 0,
-      y: 0,
-      angle: 0
+      x: startPosition.x,
+      y: startPosition.y,
+      angle: startAngle
     };
 
-    const baseSpeed = 4.0;
+    const baseSpeed = 3.0;
     const turnSpeed = 0.05;
     let keys = {};
     let score = 0;
     let startTime = null;
     let gameOver = false;
-	
+    
+    let touchAngle = 0;
+    let touchDistance = 0;
+    let isTouching = false;
+
     function drawWorld() {
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
@@ -240,14 +314,20 @@
       if (keys['ArrowLeft']) player.angle -= turnSpeed;
       if (keys['ArrowRight']) player.angle += turnSpeed;
 
+      // Mobile turning (horizontal axis of touch)
+      if (isTouching) {
+        player.angle += (touchAngle) * 0.05;
+      }
+
       let dx = 0, dy = 0;
       let currentTile = getTile(Math.floor(player.x / tileSize), Math.floor(player.y / tileSize));
       let modifier = speedModifiers[currentTile] || 1.0;
       const actualSpeed = baseSpeed * modifier;
 
-      if (keys['ArrowUp']) {
-        dx = Math.cos(player.angle - Math.PI / 2) * actualSpeed;
-        dy = Math.sin(player.angle - Math.PI / 2) * actualSpeed;
+      if (keys['ArrowUp'] || (isTouching && touchDistance > 0.1)) {
+        const moveSpeed = actualSpeed * (touchDistance || 1);
+        dx = Math.cos(player.angle - Math.PI / 2) * moveSpeed;
+        dy = Math.sin(player.angle - Math.PI / 2) * moveSpeed;
       }
       if (keys['ArrowDown']) {
         dx = -Math.cos(player.angle - Math.PI / 2) * actualSpeed;
@@ -305,29 +385,48 @@
 		}
 
 		checkpoints.forEach((cp, index) => {
-		  if (!cp.found) {
-			const dx = cp.x - mapCenterX;
-			const dy = cp.y - mapCenterY;
-			const px = halfW + dx * scale;
-			const py = halfH + dy * scale;
-			minimapCtx.strokeStyle = 'purple';
-			minimapCtx.lineWidth = 2;
-			minimapCtx.beginPath();
-			minimapCtx.arc(px, py, 10, 0, Math.PI * 2);
-			minimapCtx.stroke();
-			minimapCtx.fillStyle = 'purple';
-			minimapCtx.font = 'bold 12px sans-serif';
-			minimapCtx.fillText((index + 1).toString(), px - 4, py + 4);
-		  }
+          const dx = cp.x - mapCenterX;
+          const dy = cp.y - mapCenterY;
+          const px = halfW + dx * scale;
+          const py = halfH + dy * scale;
+          minimapCtx.strokeStyle = 'purple';
+          minimapCtx.lineWidth = 2;
+          minimapCtx.beginPath();
+          minimapCtx.arc(px, py, 10, 0, Math.PI * 2);
+          minimapCtx.stroke();
+          minimapCtx.fillStyle = 'purple';
+          minimapCtx.font = 'bold 12px sans-serif';
+          minimapCtx.fillText((index + 1).toString(), px - 4, py + 4);
 		});
+
+        // Draw lines between unfound checkpoints in order
+        minimapCtx.strokeStyle = 'rgba(128, 0, 128, 0.6)'; // Semi-transparent purple
+        minimapCtx.lineWidth = 2;
+        minimapCtx.beginPath();
+        
+        const dx = startPosition.x - mapCenterX;
+        const dy = startPosition.y - mapCenterY;
+        const px = halfW + dx * scale;
+        const py = halfH + dy * scale;
+        minimapCtx.moveTo(px, py);
+        
+        checkpoints.forEach(cp => {
+          const cdx = cp.x - mapCenterX;
+          const cdy = cp.y - mapCenterY;
+          const cpx = halfW + cdx * scale;
+          const cpy = halfH + cdy * scale;
+          minimapCtx.lineTo(cpx, cpy);
+        });
+        minimapCtx.stroke();
+
 
 		// Draw player start position as hollow purple triangle
 		minimapCtx.strokeStyle = 'purple';
 		minimapCtx.lineWidth = 2;
 		minimapCtx.beginPath();
-		minimapCtx.moveTo(halfW, halfH - 20);
-		minimapCtx.lineTo(halfW - 15, halfH + 15);
-		minimapCtx.lineTo(halfW + 15, halfH + 15);
+		minimapCtx.moveTo(px, py - 20);
+		minimapCtx.lineTo(px - 20, py + 15);
+		minimapCtx.lineTo(px + 20, py + 15);
 		minimapCtx.closePath();
 		minimapCtx.stroke();
 	}
@@ -342,6 +441,57 @@
 	}
 	});
 	document.addEventListener('keyup', (e) => keys[e.key] = false);
+    
+    document.getElementById('map-toggle').addEventListener('click', () => {
+      minimapVisible = !minimapVisible;
+      minimapCanvas.style.display = minimapVisible ? 'block' : 'none';
+    });
+
+    const joystickBase = document.getElementById('joystick-base');
+    const joystickThumb = document.getElementById('joystick-thumb');
+
+    let baseRect = null;
+
+    joystickBase.addEventListener('touchstart', (e) => {
+      isTouching = true;
+      baseRect = joystickBase.getBoundingClientRect();
+      handleTouch(e);
+    });
+
+    joystickBase.addEventListener('touchmove', (e) => {
+      handleTouch(e);
+    });
+
+    joystickBase.addEventListener('touchend', () => {
+      isTouching = false;
+      touchDistance = 0;
+      joystickThumb.style.left = '30px';
+      joystickThumb.style.top = '30px';
+    });
+
+    function handleTouch(e) {
+      const touch = e.touches[0];
+      const dx = touch.clientX - (baseRect.left + 50);
+      const dy = touch.clientY - (baseRect.top + 50);
+    
+      // Ignore bottom-half input
+      if (dy > 0) {
+        touchDistance = 0;
+        touchAngle = 0;
+        joystickThumb.style.left = '30px';
+        joystickThumb.style.top = '30px';
+        return;
+      }
+    
+      const dist = Math.min(Math.hypot(dx, dy), 40); // Max thumb move
+      const angle = Math.atan2(dy, dx);
+    
+      touchAngle = angle + Math.PI/2;
+      touchDistance = dist / 40; // Normalize to [0, 1]
+    
+      joystickThumb.style.left = 50 + Math.cos(angle) * dist - 20 + 'px';
+      joystickThumb.style.top = 50 + Math.sin(angle) * dist - 20 + 'px';
+    }
 
   function gameLoop() {
     if (!gameOver) {
@@ -354,10 +504,15 @@
     }
   }
 
-  window.onload = () => {
-    startPosition = { x: player.x, y: player.y };
-	generateRandomCheckpoints();
-  }
+    window.onload = () => {
+      startPosition = { x: player.x, y: player.y };
+      generateRandomCheckpoints();
+
+      // Enable mobile controls only on mobile screens
+      if (window.innerWidth <= 768 || 'ontouchstart' in window) {
+        document.getElementById('mobile-controls').style.display = 'flex';
+      }
+    }
 
     generateChunk(0, 0);
     drawWorld();
