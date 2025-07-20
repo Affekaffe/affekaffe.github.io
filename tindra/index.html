@@ -11,84 +11,105 @@
 
       canvas#game {
         touch-action: none; /* Prevent pinch-zoom etc. */
+        flex:1;
       }
     }
-    body {
-      margin: 0;
-      overflow: hidden;
-      touch-action: none;
-    }
+	html, body {
+	  margin: 0;
+	  padding: 0;
+	  overflow: hidden;
+	  touch-action: none;
+	  height: 100%;
+	  width: 100%;
+	}
+
+	canvas {
+	  display: block;
+	  margin-left: 20vw;
+	}
     body {
       font-family: sans-serif;
       text-align: center;
       background: #e0f7fa;
     }
-    canvas {
-      border: 2px solid #333;
-      background: #fff;
-    }
     #info {
       margin: 10px;
     }
-    #mobile-controls {
-      position: absolute;
-      bottom: 20px;
-      left: 20px;
-      z-index: 10;
-      display: flex;
-      align-items: center;
-      gap: 20px;
-    }
+	#mobile-controls {
+	  position: fixed;
+	  bottom: 20px;
+	  left: 10px;
+	  z-index: 10;
+	  display: flex;
+	  align-items: center;
+	  gap: 20px;
+	}
 
-    #joystick-base {
-      width: 150px;
-      height: 150px;
-      border-radius: 50%;
-      background: rgba(100, 100, 100, 0.4);
-      position: relative;
-      touch-action: none;
-      mask-image: linear-gradient(to top, transparent 50%, black 50%);
-      -webkit-mask-image: linear-gradient(to top, transparent 30%, black 50%);
-    }
+	#joystick-base {
+	  position: absolute;
+	  left: 5vw;
+	  top: 50%;
+	  transform: translateY(-50%);
+	  width: 25vw;
+	  height: 25vw;
+	  max-width: 160px;
+	  max-height: 160px;
+	  background: rgba(100, 100, 100, 0.3);
+	  border-radius: 50%;
+	  touch-action: none;
+	  mask-image: linear-gradient(to top, transparent 50%, black 50%);
+	  -webkit-mask-image: linear-gradient(to top, transparent 30%, black 50%);
+	  pointer-events: auto;
+	}
 
-    #joystick-thumb {
-      width: 60px;
-      height: 60px;
-      background: rgba(50, 50, 200, 0.7);
-      border-radius: 50%;
-      position: absolute;
-      left: 45px;
-      top: 45px;
-      touch-action: none;
-    }
+	#joystick-thumb {
+	  width: 40%;
+	  height: 40%;
+	  background: rgba(50, 50, 200, 0.7);
+	  border-radius: 50%;
+	  position: absolute;
+	  left: 30%;
+	  top: 30%;
+	  touch-action: none;
+	}
 
-    #map-toggle {
+
+	#map-toggle {
+	  position: fixed;
+	  right: 10px;
+	  bottom: 20px;
+	  padding: 14px 18px;
+	  font-size: 16px;
+	  background: #222;
+	  color: #fff;
+	  border-radius: 12px;
+	  border: none;
+	  z-index: 20;
+	  opacity: 0.9;
+	}
+    #minimap {
+      display: none;
       position: absolute;
-      top: 20px;
-      right: 20px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-70%, -40%);
       z-index: 20;
-      padding: 12px 20px;
-      font-size: 18px;
-      border-radius: 12px;
-      border: none;
-      background-color: #222;
-      color: white;
-      opacity: 0.9;
+      background: transparent;
+      pointer-events: none;      /* Keeps it square */             /* 
     }
   </style>
 </head>
 <body>
   <h1>Tindra Lost</h1>
   <div id="info">Time: <span id="timer">0.0</span> s | Checkpoints: <span id="score">0</span></div>
-  <div id="mobile-controls" style="display: none;">
-    <div id="joystick-base">
-      <div id="joystick-thumb"></div>
-    </div>
-    <button id="map-toggle">Map</button>
-  </div>
-  <canvas id="game" width="400" height="400"></canvas>
-<canvas id="minimap" width="400" height="400"
-  style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); border:2px solid #333; z-index:15; background:#fff;"></canvas>
+	<div id="mobile-controls" style="display: none;">
+	  <div id="joystick-base">
+		<div id="joystick-thumb"></div>
+	  </div>
+	  <button id="map-toggle">Map</button>
+	</div>
+<canvas id="game"></canvas>
+<canvas id="minimap"></canvas>
 
   <script>
     const canvas = document.getElementById('game');
@@ -337,15 +358,15 @@
       let modifier = speedModifiers[currentTile] || 1.0;
       const actualSpeed = baseSpeed * modifier;
 
-      if (keys['ArrowDown'] || isTouching) {
+      if (keys['ArrowUp'] || isTouching) {
         const moveStrength = Math.cos(touchAngle); // forward=1, backward=-1
         const moveSpeed = actualSpeed * moveStrength * (touchDistance || 1);
         dx = Math.cos(player.angle - Math.PI / 2) * moveSpeed;
         dy = Math.sin(player.angle - Math.PI / 2) * moveSpeed;
       }
-      if (keys['ArrowUp']) {
-        dx = Math.cos(player.angle - Math.PI / 2) * actualSpeed;
-        dy = Math.sin(player.angle - Math.PI / 2) * actualSpeed;
+      if (keys['ArrowDown']) {
+        dx = -Math.cos(player.angle - Math.PI / 2) * actualSpeed;
+        dy = -Math.sin(player.angle - Math.PI / 2) * actualSpeed;
       }
 
       const nextX = player.x + dx;
@@ -374,7 +395,6 @@
     }
 
 	function drawMinimap() {
-		minimapCtx.clearRect(0, 0, minimapCanvas.width, minimapCanvas.height);
 		const scale = 8; // 2x size tiles
 		const halfW = minimapCanvas.width / 2;
 		const halfH = minimapCanvas.height / 2;
@@ -479,8 +499,8 @@
     joystickBase.addEventListener('touchend', () => {
       isTouching = false;
       touchDistance = 0;
-      joystickThumb.style.left = '30px';
-      joystickThumb.style.top = '30px';
+	  joystickThumb.style.left = '30%';
+	  joystickThumb.style.top = '30%';
     });
     
     document.body.addEventListener('touchmove', (e) => {
@@ -488,41 +508,58 @@
     }, { passive: false }); //prevent scrolling
     
 
-   function handleTouch(e) {
-      const touch = e.touches[0];
-      const dx = touch.clientX - (baseRect.left + 75); // joystick center X
-      const dy = touch.clientY - (baseRect.top + 75);  // joystick center Y
+	function handleTouch(e) {
+	  const touch = e.touches[0];
+	  const baseCenterX = baseRect.left + baseRect.width / 2;
+	  const baseCenterY = baseRect.top + baseRect.height / 2;
+	  const dx = touch.clientX - baseCenterX;
+	  const dy = touch.clientY - baseCenterY;
 
-      const dist = Math.min(Math.hypot(dx, dy), 60); // Max thumb movement
-      const angle = Math.atan2(dy, dx);
+	  const maxDist = baseRect.width / 2;
+	  const dist = Math.min(Math.hypot(dx, dy), maxDist);
+	  const angle = Math.atan2(dy, dx);
 
-      touchAngle = angle + Math.PI/2;
-      touchDistance = dist / 60; // Normalize to [0, 1]
+	  touchAngle = angle + Math.PI / 2;
+	  touchDistance = dist / maxDist;
 
-      joystickThumb.style.left = 75 + Math.cos(angle) * dist - 30 + 'px';
-      joystickThumb.style.top = 75 + Math.sin(angle) * dist - 30 + 'px';
-    }
+	  const thumbSize = baseRect.width * 0.4;
+	  joystickThumb.style.left = baseRect.width / 2 + Math.cos(angle) * dist - thumbSize / 2 + 'px';
+	  joystickThumb.style.top = baseRect.height / 2 + Math.sin(angle) * dist - thumbSize / 2 + 'px';
+	}
     
-  function resizeMinimap() {
-    minimapCanvas.width = window.innerWidth * 0.9;
-    minimapCanvas.height = window.innerHeight * 0.9;
-  }
-    window.addEventListener('resize', resizeMinimap);
+	function resizeMinimap() {
+	  minimapCanvas.width = window.innerWidth;
+	  minimapCanvas.height = window.innerHeight;
+	}
+	window.addEventListener('resize', resizeMinimap);
 
-  function gameLoop() {
-    if (!gameOver) {
-      if (!minimapVisible) update();
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      drawWorld();
-      drawFlashlight();
-      if (minimapVisible) drawMinimap();
-      requestAnimationFrame(gameLoop);
+ 	function resizeCanvas() {
+      const reservedSideSpace = 160; // space for joystick and map button
+      const gameWidth = window.innerWidth - reservedSideSpace * 2;
+      canvas.style.marginLeft = reservedSideSpace + 'px';
+
+      canvas.width = gameWidth;
+      canvas.height = window.innerHeight;
     }
-  }
+    window.addEventListener('resize', resizeCanvas);
+
+    resizeMinimap();
+    resizeCanvas();
+
+    function gameLoop() {
+      if (!gameOver) {
+        if (!minimapVisible) update();
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawWorld();
+        drawFlashlight();
+        if (minimapVisible) drawMinimap();
+        requestAnimationFrame(gameLoop);
+      }
+    }
 
     window.onload = () => {
       generateRandomCheckpoints();
-	  resizeMinimap();
+
       // Enable mobile controls only on mobile screens
       if (window.innerWidth <= 768 || 'ontouchstart' in window) {
         document.getElementById('mobile-controls').style.display = 'flex';
