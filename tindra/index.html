@@ -14,6 +14,11 @@
       }
     }
     body {
+      margin: 0;
+      overflow: hidden;
+      touch-action: none;
+    }
+    body {
       font-family: sans-serif;
       text-align: center;
       background: #e0f7fa;
@@ -36,10 +41,10 @@
     }
 
     #joystick-base {
-      width: 100px;
-      height: 100px;
-      background: rgba(100, 100, 100, 0.3);
+      width: 150px;
+      height: 150px;
       border-radius: 50%;
+      background: rgba(100, 100, 100, 0.4);
       position: relative;
       touch-action: none;
       mask-image: linear-gradient(to top, transparent 50%, black 50%);
@@ -47,23 +52,28 @@
     }
 
     #joystick-thumb {
-      width: 40px;
-      height: 40px;
+      width: 60px;
+      height: 60px;
       background: rgba(50, 50, 200, 0.7);
       border-radius: 50%;
       position: absolute;
-      left: 30px;
-      top: 30px;
+      left: 45px;
+      top: 45px;
       touch-action: none;
     }
 
     #map-toggle {
-      padding: 10px 15px;
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      z-index: 20;
+      padding: 12px 20px;
       font-size: 18px;
-      border-radius: 10px;
+      border-radius: 12px;
       border: none;
-      background-color: #333;
+      background-color: #222;
       color: white;
+      opacity: 0.9;
     }
   </style>
 </head>
@@ -77,7 +87,8 @@
     <button id="map-toggle">Map</button>
   </div>
   <canvas id="game" width="400" height="400"></canvas>
-  <canvas id="minimap" width="400" height="400" style="display:none; position:absolute; top:10px; right:10px; border:1px solid #333;"></canvas>
+<canvas id="minimap" width="400" height="400"
+  style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); border:2px solid #333; z-index:15; background:#fff;"></canvas>
 
   <script>
     const canvas = document.getElementById('game');
@@ -316,7 +327,9 @@
 
       // Mobile turning (horizontal axis of touch)
       if (isTouching) {
-        player.angle += (touchAngle) * 0.05;
+        // Rotation based on horizontal input only
+        const turnStrength =Math.sin(touchAngle); // -1 to 1
+        player.angle += turnStrength * 0.05;
       }
 
       let dx = 0, dy = 0;
@@ -324,14 +337,15 @@
       let modifier = speedModifiers[currentTile] || 1.0;
       const actualSpeed = baseSpeed * modifier;
 
-      if (keys['ArrowUp'] || (isTouching && touchDistance > 0.1)) {
-        const moveSpeed = actualSpeed * (touchDistance || 1);
+      if (keys['ArrowDown'] || isTouching) {
+        const moveStrength = Math.cos(touchAngle); // forward=1, backward=-1
+        const moveSpeed = actualSpeed * moveStrength * (touchDistance || 1);
         dx = Math.cos(player.angle - Math.PI / 2) * moveSpeed;
         dy = Math.sin(player.angle - Math.PI / 2) * moveSpeed;
       }
-      if (keys['ArrowDown']) {
-        dx = -Math.cos(player.angle - Math.PI / 2) * actualSpeed;
-        dy = -Math.sin(player.angle - Math.PI / 2) * actualSpeed;
+      if (keys['ArrowUp']) {
+        dx = Math.cos(player.angle - Math.PI / 2) * actualSpeed;
+        dy = Math.sin(player.angle - Math.PI / 2) * actualSpeed;
       }
 
       const nextX = player.x + dx;
@@ -468,30 +482,32 @@
       joystickThumb.style.left = '30px';
       joystickThumb.style.top = '30px';
     });
+    
+    document.body.addEventListener('touchmove', (e) => {
+      e.preventDefault();
+    }, { passive: false }); //prevent scrolling
+    
 
-    function handleTouch(e) {
+   function handleTouch(e) {
       const touch = e.touches[0];
-      const dx = touch.clientX - (baseRect.left + 50);
-      const dy = touch.clientY - (baseRect.top + 50);
-    
-      // Ignore bottom-half input
-      if (dy > 0) {
-        touchDistance = 0;
-        touchAngle = 0;
-        joystickThumb.style.left = '30px';
-        joystickThumb.style.top = '30px';
-        return;
-      }
-    
-      const dist = Math.min(Math.hypot(dx, dy), 40); // Max thumb move
+      const dx = touch.clientX - (baseRect.left + 75); // joystick center X
+      const dy = touch.clientY - (baseRect.top + 75);  // joystick center Y
+
+      const dist = Math.min(Math.hypot(dx, dy), 60); // Max thumb movement
       const angle = Math.atan2(dy, dx);
-    
+
       touchAngle = angle + Math.PI/2;
-      touchDistance = dist / 40; // Normalize to [0, 1]
-    
-      joystickThumb.style.left = 50 + Math.cos(angle) * dist - 20 + 'px';
-      joystickThumb.style.top = 50 + Math.sin(angle) * dist - 20 + 'px';
+      touchDistance = dist / 60; // Normalize to [0, 1]
+
+      joystickThumb.style.left = 75 + Math.cos(angle) * dist - 30 + 'px';
+      joystickThumb.style.top = 75 + Math.sin(angle) * dist - 30 + 'px';
     }
+    
+  function resizeMinimap() {
+    minimapCanvas.width = window.innerWidth * 0.9;
+    minimapCanvas.height = window.innerHeight * 0.9;
+  }
+    window.addEventListener('resize', resizeMinimap);
 
   function gameLoop() {
     if (!gameOver) {
@@ -505,9 +521,8 @@
   }
 
     window.onload = () => {
-      startPosition = { x: player.x, y: player.y };
       generateRandomCheckpoints();
-
+	  resizeMinimap();
       // Enable mobile controls only on mobile screens
       if (window.innerWidth <= 768 || 'ontouchstart' in window) {
         document.getElementById('mobile-controls').style.display = 'flex';
