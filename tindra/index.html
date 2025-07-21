@@ -176,7 +176,7 @@
       'X': '#222', //Building
     };
 
-    const impassableTiles = ['~', 'X'];
+    const impassableTiles = ['X'];
     const darkTiles = ['X']; // Only buildings block light fully
 
     const semiDarkTiles = ['T']; // Dense vegetation blocks light 50%
@@ -185,6 +185,7 @@
       '.': 1.0,
       'T': 0.4,
       '#': 1.5,
+      '~': 0.1
     };
 
     let terrainChunks = new Map();
