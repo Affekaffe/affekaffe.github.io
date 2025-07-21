@@ -5,12 +5,12 @@
   <meta charset="UTF-8">
   <title>Tindra Lost</title>
   <style>
-  @media (max-width: 768px) {
-      canvas#game {
-        touch-action: none; /* Prevent pinch-zoom etc. */
-        flex:1;
+    @media (max-width: 768px) {
+        canvas#game {
+          touch-action: none; /* Prevent pinch-zoom etc. */
+          flex:1;
+        }
       }
-    }
     html, body {
       margin: 0;
       padding: 0;
@@ -29,76 +29,71 @@
       touch-action: none;
       border: none;
     }
-	canvas {
-	  display: block;
-	  margin-left: 0px;
-	}
+  	canvas {
+  	  display: block;
+  	  margin-left: 0px;
+  	}
     body {
-      font-family: sans-serif;
-      text-align: center;
-      background: #e0f7fa;
+        font-family: sans-serif;
+        text-align: center;
+        background: #e0f7fa;
+      }
+      #info {
+        margin: 10px;
+      }
+  /* Hide joystick and map on desktop */
+    body.mobile #joystick-base,
+    body.mobile #map-toggle {
+      display: block;
     }
-    #info {
-      margin: 10px;
+    
+    #joystick-base,
+    #map-toggle {
+      display: none;
     }
-/* Hide joystick and map on desktop */
-@media (min-width: 769px) {
-  #joystick-base,
-  #map-toggle {
-    display: none !important;
-  }
-}
-
-@media (max-width: 768px) {
-  #joystick-base,
-  #map-toggle {
-    display: block;
-  }
-
-  #joystick-base {
-    position: absolute;
-    bottom: 20%;
-    left: 20px;
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    background: rgba(100, 100, 100, 0.4);
-    z-index: 10;
-    touch-action: none;
-    display: block;
-  }
-  
-  #joystick-thumb {
-	  width: 40%;
-	  height: 40%;
-	  background: rgba(50, 50, 200, 0.7);
-	  border-radius: 50%;
-	  position: absolute;
-	  left: 30%;
-	  top: 30%;
-	  touch-action: none;
-	}
-
-  #map-toggle {
-    position: absolute;
-    bottom: 20%;
-    right: 20px;
-    z-index: 20;
-    padding: 40px 40px;
-    font-size: 18px;
-    border-radius: 12px;
-    border: none;
-    background-color: #222;
-    color: white;
-    opacity: 0.9;
-  }
-}
+    
+    body.mobile #joystick-base {
+      position: absolute;
+      bottom: 20%;
+      left: 20px;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: rgba(100, 100, 100, 0.4);
+      z-index: 10;
+      touch-action: none;
+    }
+    
+    body.mobile #joystick-thumb {
+      width: 40%;
+      height: 40%;
+      background: rgba(50, 50, 200, 0.7);
+      border-radius: 50%;
+      position: absolute;
+      left: 30%;
+      top: 30%;
+      touch-action: none;
+    }
+    
+    body.mobile #map-toggle {
+      position: absolute;
+      bottom: 20%;
+      right: 20px;
+      z-index: 10;
+      padding: 40px 40px;
+      font-size: 18px;
+      border-radius: 12px;
+      border: none;
+      background-color: #222;
+      color: white;
+      opacity: 0.9;
+    }
     #minimap {
       display: none;
       position: absolute;
       top: 50%;
       left: 50%;
-      transform: translate(-70%, -40%);
+      transform: translate(-50%, -50%);
       z-index: 20;
       background: transparent;
       pointer-events: none;      /* Keeps it square */
@@ -125,11 +120,6 @@
       border-radius: 12px;
       cursor: pointer;
     }
-    
-    @media (min-width: 769px) {
-      #map-toggle {
-        display: none !important;
-      }
     }
 
   </style>
@@ -149,6 +139,14 @@
 <canvas id="minimap"></canvas>
 
   <script>
+  	function isMobileDevice() {
+      return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    }
+    
+    if (isMobileDevice()) {
+      document.body.classList.add('mobile');
+    }
+    
     const canvas = document.getElementById('game');
     const ctx = canvas.getContext('2d');
     const timerDisplay = document.getElementById('timer');
@@ -157,7 +155,7 @@
   	const minimapCtx = minimapCanvas.getContext('2d');
   	let minimapVisible = false;
   	const playerImage = new Image();
-    playerImage.src = 'player.png'; // Make sure this matches your filename
+    playerImage.src = 'https://kartritaren.se/tindra/player.png'; // Make sure this matches your filename
 
     let startPosition = { x: 0, y: 0}; // Declared early to avoid ReferenceError
     let startAngle = Math.random() * 6
@@ -187,7 +185,6 @@
 
     let terrainChunks = new Map();
 	let checkpoints = [];
-	
     function generateRandomCheckpoints() {
       const count = Math.floor(Math.random() * 3) + 6; // 6 to 8
       checkpoints = [];
@@ -576,29 +573,29 @@
  	function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeCanvas);
+  }
+  window.addEventListener('resize', resizeCanvas);
 
-    resizeMinimap();
-    resizeCanvas();
+  resizeMinimap();
+  resizeCanvas();
 
-    function gameLoop() {
-      if (!gameOver) {
-        if (!minimapVisible) update();
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawWorld();
-        drawFlashlight();
-        if (minimapVisible) drawMinimap();
-        requestAnimationFrame(gameLoop);
-      }
+  function gameLoop() {
+    if (!gameOver) {
+      if (!minimapVisible) update();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawWorld();
+      drawFlashlight();
+      if (minimapVisible) drawMinimap();
+      requestAnimationFrame(gameLoop);
     }
+  }
    
     document.getElementById('start-button').addEventListener('click', async () => {
       const startScreen = document.getElementById('start-screen');
       startScreen.style.display = 'none';
     
       // Fullscreen only on mobile
-      if (window.innerWidth <= 768 && document.documentElement.requestFullscreen) {
+      if (isMobileDevice() && document.documentElement.requestFullscreen) {
         try {
           await document.documentElement.requestFullscreen();
         } catch (err) {
