@@ -5,12 +5,7 @@
   <meta charset="UTF-8">
   <title>Tindra Lost</title>
   <style>
-    @media (max-width: 768px) {
-        canvas#game {
-          touch-action: none; /* Prevent pinch-zoom etc. */
-          flex:1;
-        }
-      }
+
     html, body {
       margin: 0;
       padding: 0;
@@ -42,6 +37,11 @@
         margin: 10px;
       }
   /* Hide joystick and map on desktop */
+  
+    body.mobile canvas#game {
+      touch-action: none; /* Prevent pinch-zoom etc. */
+      flex:1;
+    }
     body.mobile #joystick-base,
     body.mobile #map-toggle {
       display: block;
@@ -111,7 +111,7 @@
       z-index: 50;
     }
     
-    #start-button {
+    .start-button {
       padding: 16px 32px;
       font-size: 24px;
       background: #2196f3;
@@ -119,6 +119,7 @@
       border: none;
       border-radius: 12px;
       cursor: pointer;
+      margin: 8px;
     }
     }
 
@@ -131,10 +132,11 @@
   <div id="joystick-thumb"></div>
 </div>
 <button id="map-toggle">Map</button>
-  <div id="start-screen">
-    <h2>Tindra Lost</h2>
-    <button id="start-button">Play</button>
-  </div>
+<div id="start-screen">
+  <h2>Tindra Lost</h2>
+  <button id="normal-button" class=start-button>Normal</button>
+  <button id="night-button" class=start-button>Night</button>
+</div>
 <canvas id="game"></canvas>
 <canvas id="minimap"></canvas>
 
@@ -163,6 +165,8 @@
     const tileSize = 40;
     const chunkSize = 10; //tiles
     const mapSize = 30; //tiles
+
+    let playMode = "normal"; // default
 
     const colorMap = {
       '.': '#ccffcc', //
@@ -316,27 +320,43 @@
     }
 
     function drawFlashlight() {
+      if (playMode === "normal") {
+        // Simple radial gradient around player
+        const px = canvas.width / 2;
+        const py = canvas.height / 2;
+        const lightRadius = 250;
+    
+        const gradient = ctx.createRadialGradient(px, py, 0, px, py, lightRadius);
+        gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
+        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+    
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        return;
+      }
+    
+      // Existing "night" flashlight beam code
       const lightRadius = 200;
       const beamAngle = 2 * Math.PI / 3;
       const px = canvas.width / 2;
       const py = canvas.height / 2;
-
+    
       const gradient = ctx.createRadialGradient(px, py, 0, px, py, lightRadius);
       gradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
       gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
-
+    
       const maskCanvas = document.createElement('canvas');
       maskCanvas.width = canvas.width;
       maskCanvas.height = canvas.height;
       const maskCtx = maskCanvas.getContext('2d');
-
+    
       maskCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
       maskCtx.fillRect(0, 0, canvas.width, canvas.height);
-
+    
       maskCtx.globalCompositeOperation = 'destination-out';
       maskCtx.beginPath();
       maskCtx.moveTo(px, py);
-
+    
       for (let a = -beamAngle / 2; a <= beamAngle / 2; a += 0.03) {
         const screenAngle = -Math.PI / 2 + a;
         const worldAngle = screenAngle + player.angle;
@@ -345,14 +365,14 @@
         const ry = py + Math.sin(screenAngle) * dist;
         maskCtx.lineTo(rx, ry);
       }
-
+    
       maskCtx.closePath();
       maskCtx.fill();
-
+    
       maskCtx.globalCompositeOperation = 'hue';
       maskCtx.fillStyle = gradient;
       maskCtx.fillRect(0, 0, canvas.width, canvas.height);
-
+    
       ctx.drawImage(maskCanvas, 0, 0);
     }
 
@@ -590,21 +610,30 @@
     }
   }
    
-    document.getElementById('start-button').addEventListener('click', async () => {
-      const startScreen = document.getElementById('start-screen');
-      startScreen.style.display = 'none';
-    
-      // Fullscreen only on mobile
-      if (isMobileDevice() && document.documentElement.requestFullscreen) {
-        try {
-          await document.documentElement.requestFullscreen();
-        } catch (err) {
-          console.warn("Fullscreen failed:", err);
-        }
+  async function startGame() {
+    document.getElementById('start-screen').style.display = 'none';
+  
+    // Only request fullscreen on actual mobile
+    if (isMobileDevice() && document.documentElement.requestFullscreen) {
+      try {
+        await document.documentElement.requestFullscreen();
+      } catch (err) {
+        console.warn("Fullscreen failed:", err);
       }
+    }
+  
+    gameLoop();
+  }
     
-      gameLoop();
-    });
+  document.getElementById('normal-button').addEventListener('click', () => {
+    playMode = "normal";
+    startGame();
+  });
+  
+  document.getElementById('night-button').addEventListener('click', () => {
+    playMode = "night";
+    startGame();
+  });
     
     window.onload = () => {
       generateRandomCheckpoints();
