@@ -184,7 +184,9 @@
   	let minimapVisible = false;
   	const playerImage = new Image();
     playerImage.src = 'https://kartritaren.se/tindra/player.png'; // Make sure this matches your filename
-
+    const npc1 = new Image();
+    npc1.src = 'https://kartritaren.se/tindra/npc1.png'; // Use correct path
+    
     let startPosition = { x: 0, y: 0}; // Declared early to avoid ReferenceError
     let startAngle = Math.random() * 6
 
@@ -192,6 +194,10 @@
     const chunkSize = 10; //tiles
     const mapSize = 30; //tiles
     const checkpointCount = Math.floor(Math.random() * 3) + 6;
+    
+    let activeNPC = null;
+    let npcTimer = 0;
+    
     let playMode = "normal"; // default
 
     const colorMap = {
@@ -394,13 +400,21 @@ function generateChunk(cx, cy) {
       });
 
       ctx.restore();
+      
 
       const imageSize = tileSize; // Adjust size if needed (you can try tileSize * 1.5 etc.)
       ctx.save();
       ctx.translate(canvas.width / 2, canvas.height / 2);
       ctx.drawImage(playerImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
       ctx.restore();
-
+      
+      if (activeNPC) {
+        ctx.save();
+        ctx.translate(activeNPC.x, activeNPC.y);
+        ctx.rotate(activeNPC.angle);
+        ctx.drawImage(npc1, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+        ctx.restore();
+      }
       ctx.strokeStyle = 'black';
       ctx.beginPath();
       ctx.moveTo(canvas.width / 2, canvas.height / 2);
@@ -579,6 +593,35 @@ function generateChunk(cx, cy) {
 		
     if (score==checkpointCount) {
       showEndScreen();
+    }
+    
+    // Countdown to spawn NPC
+    npcTimer -= 1 / 60;
+    
+    if (!activeNPC && npcTimer <= 0) {
+      // Spawn NPC
+      const fromLeft = Math.random() < 0.5;
+      const y = player.y + (Math.random() * 400 - 200); // +/- 200px vertically
+      activeNPC = {
+        x: player.x + (fromLeft ? -canvas.width / 2 - 100 : canvas.width / 2 + 100),
+        y: y,
+        angle: fromLeft ? 0 : Math.PI,
+        speed: 4 + Math.random() * 2,
+        direction: fromLeft ? 1 : -1
+      };
+    
+      // Set next spawn timer (10–30 sec)
+      npcTimer = 10 + Math.random() * 15;
+    }
+    
+    // Move NPC
+    if (activeNPC) {
+      activeNPC.x += activeNPC.direction * activeNPC.speed;
+    
+      // Despawn when far from player view
+      if (Math.abs(activeNPC.x - player.x) > canvas.width) {
+        activeNPC = null;
+      }
     }
     }
 
