@@ -13,13 +13,13 @@ function tilesInit() {
     ground: new Tile({
       name: 'ground',
       color: '#ccffcc',
-      image: '../assets/ground1.png'
+      image: './assets/ground1.png'
   }),
 
     tree: new Tile({
       name: 'tree',
       color: '#85FF66',
-      image: '../assets/tree1.png',
+      image: './assets/tree1.png',
       speed: 0.4,
       semiBlocksLight: true
   }),
@@ -27,7 +27,7 @@ function tilesInit() {
     building: new Tile({
       name: 'building',
       color: '#222',
-      image: '../assets/building1.png',
+      image: './assets/building1.png',
       speed: 0.01,
       impassable: true,
       blocksLight: true
@@ -36,14 +36,14 @@ function tilesInit() {
     open: new Tile({
       name: 'open',
       color: '#FFBA36',
-      image: '../assets/open1.png',
+      image: './assets/open1.png',
       speed: 1.5
   }),
 
     water: new Tile({
       name: 'water',
       color: '#00FFFF',
-      image: '../assets/water1.png',
+      image: './assets/water1.png',
       speed: 0.1
   })
   };
