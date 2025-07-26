@@ -1,4 +1,4 @@
-import { world, impassableTiles, getTile } from "./terrain.js";
+import { world, getTile } from "./terrain.js";
 import { generateChunk } from "./terrain.js";
 
 const mapSize = world.mapSize;
@@ -20,7 +20,7 @@ function generateRandomCheckpoints(checkpointCount) {
       generateChunk(cx, cy);
 
       const tile = getTile(x, y);
-      if (impassableTiles.includes(tile)) continue; // Avoid invalid tiles
+      if (tile.impassable) continue; // Avoid invalid tiles
 
       const minDistance = 6; // in tiles
       let tooClose = false;

@@ -1,8 +1,7 @@
 import { keys, isTouching, getTouchDistance, getTouchAngle } from './input.js';
-import { world, speedModifiers, getTile } from './terrain.js';
+import { world, getTile } from './terrain.js';
 import { getCheckpoint, getCheckpointCount } from './checkpoints.js';
 import { updateNpcs } from './npc.js';
-import { showEndScreen } from './ui.js';
 
 let player = {
   x: 0,
@@ -76,8 +75,8 @@ function update() {
 
   let dx = 0, dy = 0;
   let currentTile = getTileAtPlayer();
-  let currentSpeedModifier = speedModifiers[currentTile] || 1.0;
-  const actualSpeed = baseSpeed * currentSpeedModifier; //TODO
+  let currentSpeedModifier = currentTile.speed;
+  const actualSpeed = baseSpeed * currentSpeedModifier;
 
   if (keys['ArrowUp'] || isTouching) {
     const moveStrength = Math.cos(getTouchAngle()); // forward=1, backward=-1

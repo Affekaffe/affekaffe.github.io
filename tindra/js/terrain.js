@@ -1,21 +1,54 @@
+import Tile from './tile.js';
+
 const tileSize = 40; //pixels
 const chunkSize = 10; //tiles
 const mapSize = 30; //tiles
 
-const speedModifiers = {
-  '.': 1.0,
-  'T': 0.4,
-  '#': 1.5,
-  '~': 0.1
-};
-
-const impassableTiles = ['X'];
-const darkTiles = ['X']; // Only buildings block light fully
-
-const semiDarkTiles = ['T']; // Dense vegetation blocks light 50%
-
-const world = {tileSize: tileSize, chunkSize: chunkSize, mapSize: mapSize}
+let world = {tileSize: tileSize, chunkSize: chunkSize, mapSize: mapSize};
 let terrainChunks = new Map();
+let tiles = tilesInit();
+
+function tilesInit() {
+  const tilesToReturn = {
+    ground: new Tile({
+      name: 'ground',
+      color: '#ccffcc',
+      image: '../assets/ground1.png'
+  }),
+
+    tree: new Tile({
+      name: 'tree',
+      color: '#85FF66',
+      image: '../assets/tree1.png',
+      speed: 0.4,
+      semiBlocksLight: true
+  }),
+
+    building: new Tile({
+      name: 'building',
+      color: '#222',
+      image: '../assets/building1.png',
+      speed: 0.01,
+      impassable: true,
+      blocksLight: true
+  }),
+
+    open: new Tile({
+      name: 'open',
+      color: '#FFBA36',
+      image: '../assets/open1.png',
+      speed: 1.5
+  }),
+
+    water: new Tile({
+      name: 'water',
+      color: '#00FFFF',
+      image: '../assets/water1.png',
+      speed: 0.1
+  })
+  };
+  return tilesToReturn;
+}
 
 function getTile(x, y) {
   const cx = Math.floor(x / chunkSize);
@@ -38,15 +71,15 @@ function generateChunk(cx, cy) {
     const row = [];
     for (let x = 0; x < chunkSize; x++) {
       const r = Math.random();
-      let tile = '.';
-      if (r < 0.05) tile = 'X';      // Building
-      else if (r < 0.25) tile = 'T'; // Trees
-      else if (r < 0.3) tile = '#';  // Open ground
+      let tile = tiles.ground;
+      if (r < 0.05) tile = tiles.building;      // Building
+      else if (r < 0.25) tile = tiles.tree; // Trees
+      else if (r < 0.3) tile = tiles.open;  // Open ground
       row.push(tile);
     }
     chunk.push(row);
   }
-
+  
   // Step 2: Smoothing to form clusters of trees/buildings
   for (let pass = 0; pass < 2; pass++) {
     for (let y = 0; y < chunkSize; y++) {
@@ -63,10 +96,10 @@ function generateChunk(cx, cy) {
           }
         }
 
-        const count = (symbol) => neighbors.filter(n => n === symbol).length;
+        const count = (name) => neighbors.filter(n => n.name === name).length;
 
-        if (count('T') >= 4 && Math.random() < 0.8) chunk[y][x] = 'T';
-        else if (count('X') >= 4 && Math.random() < 0.4) chunk[y][x] = 'X';
+        if (count(tiles.tree) >= 4 && Math.random() < 0.8) chunk[y][x] = tiles.tree;
+        else if (count(tiles.building) >= 4 && Math.random() < 0.4) chunk[y][x] = tiles.building;
       }
     }
   }
@@ -82,7 +115,7 @@ function generateChunk(cx, cy) {
         const dx = x - cx;
         const dy = y - cy;
         if (Math.sqrt(dx * dx + dy * dy) <= radius) {
-          chunk[y][x] = '~';
+          chunk[y][x] = tiles.water;
         }
       }
     }
@@ -99,7 +132,7 @@ function generateChunk(cx, cy) {
       const y = vertical ? i : linePos + wiggle;
 
       if (x >= 0 && y >= 0 && x < chunkSize && y < chunkSize) {
-        chunk[y][x] = '~';
+        chunk[y][x] = tiles.water;
         // Occasionally wiggle the line to make it more natural
         if (Math.random() < 0.4) wiggle += Math.floor(Math.random() * 3) - 1;
         wiggle = Math.max(-2, Math.min(2, wiggle)); // Limit curve
@@ -113,6 +146,6 @@ function generateChunk(cx, cy) {
 
 export {world, 
   generateChunk, 
-  getTile, 
-  impassableTiles, 
-  speedModifiers};
+  getTile,
+  tilesInit
+};

@@ -17,14 +17,6 @@ playerImage.src = 'https://kartritaren.se/tindra/player.png'; // Make sure this 
 const npc1 = new Image();
 npc1.src = 'https://kartritaren.se/tindra/npc1.png'; // Use correct path
 
-const colorMap = {
-  '.': '#ccffcc', //
-  'T': '#85FF66', //Dense Vegetation
-  '~': '#00FFFF', //Water
-  '#': '#FFBA36', //Open
-  'X': '#222', //Building
-};
-
 function drawWorld(gameMode) {
   const pX = getPlayerX();
   const pY = getPlayerY();
@@ -41,15 +33,35 @@ function drawWorld(gameMode) {
   const minY = Math.floor((pY - canvas.height / 2) / tileSize) - 1;
   const maxY = Math.floor((pY + canvas.height / 2) / tileSize) + 1;
 
-  for (let y = minY; y <= maxY; y++) {
-    for (let x = minX; x <= maxX; x++) {
-      const tile = getTile(x, y);
-      ctx.fillStyle = colorMap[tile] || '#ffffff';
-      const centerX = x * tileSize + tileSize / 2;
-      const centerY = y * tileSize + tileSize / 2;
-      ctx.fillRect(centerX - tileSize * 0.55, centerY - tileSize * 0.55, tileSize * 1.1, tileSize * 1.1);
+for (let y = minY; y <= maxY; y++) {
+  for (let x = minX; x <= maxX; x++) {
+    const tile = getTile(x, y);
+    const centerX = x * tileSize + tileSize / 2;
+    const centerY = y * tileSize + tileSize / 2;
+
+    if (tile.image) {
+      const tileImage = new Image();
+      tileImage.src = tile.image;
+
+      ctx.drawImage(
+        tileImage,
+        centerX - tileSize / 2,
+        centerY - tileSize / 2,
+        tileSize,
+        tileSize
+      );
+    } else {
+      // fallback: white square if image not ready
+      ctx.fillStyle = tile.color || '#ffffff';
+      ctx.fillRect(
+        centerX - tileSize * 0.55,
+        centerY - tileSize * 0.55,
+        tileSize * 1.1,
+        tileSize * 1.1
+      );
     }
   }
+}
 
   checkpoints.forEach(cp => {
     if (!cp.found) {
@@ -73,7 +85,7 @@ function drawWorld(gameMode) {
     drawGradient();
   }
   else {
-    drawFlashlight(pX, pY);
+    drawFlashlight(pX, pY, pAngle);
   }
 
   drawCompass(pAngle);
@@ -104,7 +116,7 @@ function drawGradient() {
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawFlashlight(pX, pY) {
+function drawFlashlight(pX, pY, pAngle) {
   const lightRadius = 200;
   const beamAngle = 2 * Math.PI / 3;
   const px = canvas.width / 2;
@@ -128,7 +140,7 @@ function drawFlashlight(pX, pY) {
 
   for (let a = -beamAngle / 2; a <= beamAngle / 2; a += 0.03) {
     const screenAngle = -Math.PI / 2 + a;
-    const worldAngle = screenAngle + player.angle;
+    const worldAngle = screenAngle + pAngle;
     const dist = castRayWorld(pX, pY, worldAngle, lightRadius);
     const rx = px + Math.cos(screenAngle) * dist;
     const ry = py + Math.sin(screenAngle) * dist;
@@ -155,8 +167,8 @@ function castRayWorld(pX, pY, angle, maxDist) {
     const tileY = Math.floor(wy / tileSize);
     const tile = getTile(tileX, tileY);
 
-    if (darkTiles.includes(tile)) return d;
-    if (semiDarkTiles.includes(tile)) {
+    if (tile.blocksLight) return d;
+    if (tile.semiBlocksLight) {
       accumulatedOpacity += 0.5;
       if (accumulatedOpacity >= 1) return d;
     }
@@ -221,7 +233,7 @@ function drawMinimap(checkpoints) {
     const tx = Math.floor(mapCenterX + dx);
     const ty = Math.floor(mapCenterY + dy);
     const tile = getTile(tx, ty);
-    const color = colorMap[tile] || '#fff';
+    const color = tile.color || '#fff';
     minimapCtx.fillStyle = color;
     minimapCtx.fillRect(
       halfW + dx * scale,

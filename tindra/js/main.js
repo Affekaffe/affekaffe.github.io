@@ -4,7 +4,7 @@ import { isMobileDevice } from './utils.js';
 import { resizeMinimap, resizeCanvas } from './rendering.js';
 import { inputInit, keys } from './input.js';
 import { generateRandomCheckpoints } from './checkpoints.js';
-import { generateChunk } from './terrain.js';
+import { generateChunk, tilesInit } from './terrain.js';
 import { showEndScreen } from './ui.js';
 
 let gameMode = "normal";
@@ -38,10 +38,11 @@ function gameLoop() {
 }
 
 window.onload = () => {
-  generateRandomCheckpoints(checkpointCount);
-  resizeCanvas()
-  resizeMinimap()
+  tilesInit();
   generateChunk(0, 0);
+  generateRandomCheckpoints(checkpointCount);
+  resizeCanvas();
+  resizeMinimap();
   playerInit();
   inputInit();
 }
