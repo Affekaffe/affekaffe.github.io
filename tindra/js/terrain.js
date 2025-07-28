@@ -1,10 +1,11 @@
 import Tile from './tile.js';
 
-const tileSize = 40; //pixels
+const lightRadius = 6;
+const tileSize = window.innerHeight / (2 * lightRadius); //pixels
 const chunkSize = 10; //tiles
 const mapSize = 30; //tiles
 
-let world = {tileSize: tileSize, chunkSize: chunkSize, mapSize: mapSize};
+let world = {tileSize: tileSize, chunkSize: chunkSize, mapSize: mapSize, lightRadius: lightRadius};
 let terrainChunks = new Map();
 let tiles = tilesInit();
 
@@ -28,7 +29,7 @@ function tilesInit() {
       name: 'building',
       color: '#222',
       image: './assets/building1.png',
-      speed: 0.01,
+      speed: 0,
       impassable: true,
       blocksLight: true
   }),

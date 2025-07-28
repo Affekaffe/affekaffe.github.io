@@ -1,7 +1,7 @@
 import { getCanvas, getCtx, getMinimapCanvas, getMinimapCtx } from "./ui.js";
 import { world, getTile } from "./terrain.js";
 import { getActiveNpc } from "./npc.js";
-import { getPlayerX, getPlayerY, getPlayerAngle, getStartPosition } from "./player.js";
+import { getPlayerX, getPlayerY, getPlayerAngle, getStartPosition, isUpsideDown } from "./player.js";
 import { getCheckpoints } from "./checkpoints.js";
 import { minimapVisible } from "./input.js";
 
@@ -10,28 +10,33 @@ const ctx = getCtx();
 const minimapCanvas = getMinimapCanvas();
 const minimapCtx = getMinimapCtx();
 const tileSize = world.tileSize;
-const imageSize = tileSize; // Adjust size if needed
+const imageSize = tileSize; 
 
 const playerImage = new Image();
-playerImage.src = 'https://kartritaren.se/tindra/player.png'; // Make sure this matches your filename
+playerImage.src = './assets/player.png';
 const npc1 = new Image();
-npc1.src = 'https://kartritaren.se/tindra/npc1.png'; // Use correct path
+npc1.src = './assets/npc1.png';
+const tileBackgroundImage = new Image();
+tileBackgroundImage.src = './assets/base1.png';
+
+const lightRadiusTiles = world.lightRadius; //tiles
 
 function drawWorld(gameMode) {
   const pX = getPlayerX();
   const pY = getPlayerY();
   const pAngle = getPlayerAngle();
   const checkpoints = getCheckpoints();
+  const lightRadius = lightRadiusTiles * tileSize;
 
   ctx.save();
   ctx.translate(canvas.width / 2, canvas.height / 2);
   ctx.rotate(-pAngle);
   ctx.translate(-pX, -pY);
 
-  const minX = Math.floor((pX - canvas.width / 2) / tileSize) - 1;
-  const maxX = Math.floor((pX + canvas.width / 2) / tileSize) + 1;
-  const minY = Math.floor((pY - canvas.height / 2) / tileSize) - 1;
-  const maxY = Math.floor((pY + canvas.height / 2) / tileSize) + 1;
+  const minX = Math.floor((pX - lightRadius) / tileSize) - 1;
+  const maxX = Math.floor((pX + lightRadius) / tileSize) + 1;
+  const minY = Math.floor((pY - lightRadius) / tileSize) - 1;
+  const maxY = Math.floor((pY + lightRadius) / tileSize) + 1;
 
 for (let y = minY; y <= maxY; y++) {
   for (let x = minX; x <= maxX; x++) {
@@ -39,25 +44,22 @@ for (let y = minY; y <= maxY; y++) {
     const centerX = x * tileSize + tileSize / 2;
     const centerY = y * tileSize + tileSize / 2;
 
-    if (tile.image) {
-      const tileImage = new Image();
-      tileImage.src = tile.image;
-
-      ctx.drawImage(
-        tileImage,
-        centerX - tileSize / 2,
-        centerY - tileSize / 2,
+    if (tileBackgroundImage) {
+        ctx.drawImage(
+        tileBackgroundImage,
+        x * tileSize,
+        y * tileSize,
         tileSize,
         tileSize
       );
-    } else {
-      // fallback: white square if image not ready
-      ctx.fillStyle = tile.color || '#ffffff';
-      ctx.fillRect(
-        centerX - tileSize * 0.55,
-        centerY - tileSize * 0.55,
-        tileSize * 1.1,
-        tileSize * 1.1
+    }
+    if (tile.image) {
+      ctx.drawImage(
+        tile.image,
+        x * tileSize,
+        y * tileSize,
+        tileSize,
+        tileSize
       );
     }
   }
@@ -82,10 +84,10 @@ for (let y = minY; y <= maxY; y++) {
   drawNpc();
 
   if(gameMode==="normal"){
-    drawGradient();
+    drawGradient(lightRadius);
   }
   else {
-    drawFlashlight(pX, pY, pAngle);
+    drawFlashlight(pX, pY, pAngle, lightRadius);
   }
 
   drawCompass(pAngle);
@@ -103,21 +105,19 @@ function drawNpc() {
   }
 }
 
-function drawGradient() {
+function drawGradient(lightRadius) {
     const px = canvas.width / 2;
     const py = canvas.height / 2;
-    const lightRadius = 250;
 
     const gradient = ctx.createRadialGradient(px, py, 0, px, py, lightRadius);
     gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+    gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
 
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawFlashlight(pX, pY, pAngle) {
-  const lightRadius = 200;
+function drawFlashlight(pX, pY, pAngle, lightRadius) {
   const beamAngle = 2 * Math.PI / 3;
   const px = canvas.width / 2;
   const py = canvas.height / 2;
@@ -169,7 +169,7 @@ function castRayWorld(pX, pY, angle, maxDist) {
 
     if (tile.blocksLight) return d;
     if (tile.semiBlocksLight) {
-      accumulatedOpacity += 0.5;
+      accumulatedOpacity += 0.1;
       if (accumulatedOpacity >= 1) return d;
     }
   }

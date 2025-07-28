@@ -30,7 +30,16 @@ function getStartPosition() {
 function setPlayerPositionAndAngle(x, y, theta) {
   player.x = x;
   player.y = y;
-  player.angle = theta;
+  player.angle = theta % Math.PI;
+}
+
+function isUpsideDown() {
+  return Math.abs(player.angle) > Math.PI / 2;
+}
+
+function setPlayerAngle(theta){
+  player.angle = theta % (2 * Math.PI);
+  console.info(player.angle)
 }
 
 function setPlayerPosition(x, y){
@@ -51,7 +60,7 @@ function getPlayerAngle(){
 }
 
 function turnPlayer(speed){
-  player.angle += speed;
+  setPlayerAngle(player.angle + speed);
 }
 
 function getTileAtPlayer(){
@@ -90,6 +99,7 @@ function update() {
   }
 
   movePlayer(dx, dy);
+  if (getTileAtPlayer().impassable) movePlayer(-dx, -dy);
 
   const nextCheckpoint = getCheckpoint(score);
   if (nextCheckpoint) increaseIfCheckpointFound(nextCheckpoint);
@@ -124,6 +134,7 @@ export {
   getPlayerX,
   getPlayerY,
   getPlayerAngle,
-  getStartPosition
+  getStartPosition,
+  isUpsideDown
 };
 
