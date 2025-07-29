@@ -1,14 +1,13 @@
-import { clearScreen, drawWorld} from './rendering.js';
-import { update, playerInit } from './player.js';
+import { clearScreen, drawWorld, resizeAllCanvas} from './rendering.js';
+import { update, playerInit } from './playerHandler.js';
 import { isMobileDevice } from './utils.js';
-import { resizeMinimap, resizeCanvas } from './rendering.js';
 import { inputInit, keys } from './input.js';
 import { generateRandomCheckpoints } from './checkpoints.js';
-import { generateChunk, tilesInit } from './terrain.js';
+import { generateChunk, loadTiles } from './terrain.js';
 import { showEndScreen } from './ui.js';
+import { loadNpcs } from './npcHandler.js';
+import { gameInit, game } from './gameConfig.js';
 
-let gameMode = "normal";
-let gameOver = false;
 const checkpointCount = 8;
 
 async function startGame() {
@@ -27,10 +26,11 @@ async function startGame() {
 }
 
 function gameLoop() {
+  const gameOver = game.gameOver;
   if (!gameOver) {
-    gameOver = update();
+    update();
     clearScreen();
-    drawWorld(gameMode);
+    drawWorld();
     requestAnimationFrame(gameLoop);
   } else {
     showEndScreen();
@@ -38,27 +38,27 @@ function gameLoop() {
 }
 
 window.onload = () => {
-  tilesInit();
+  gameInit();
+  loadTiles();
+  loadNpcs();
   generateChunk(0, 0);
   generateRandomCheckpoints(checkpointCount);
-  resizeCanvas();
-  resizeMinimap();
+  resizeAllCanvas();
   playerInit();
   inputInit();
 }
 
 document.getElementById('normal-button').addEventListener('click', () => {
-  gameMode = "normal";
+  game.gameMode = "normal";
   startGame();
 });
 
 document.getElementById('night-button').addEventListener('click', () => {
-  gameMode = "night";
+  game.gameMode = "night";
   startGame();
 });;
 
-window.addEventListener('resize', resizeMinimap);
-window.addEventListener('resize', resizeCanvas);
+window.addEventListener('resize', resizeAllCanvas);
 
 if (isMobileDevice()) {
   document.body.classList.add('mobile');

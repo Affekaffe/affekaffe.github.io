@@ -1,140 +1,38 @@
-import { keys, isTouching, getTouchDistance, getTouchAngle } from './input.js';
-import { world, getTile } from './terrain.js';
-import { getCheckpoint, getCheckpointCount } from './checkpoints.js';
-import { updateNpcs } from './npc.js';
+class Player {
+  constructor({name, image, speed = 1}) {
+    this.name = name;
+    this.speed = speed;
+    this.x = 0;
+    this.y = 0;
+    this.angle = 0;
 
-let player = {
-  x: 0,
-  y: 0,
-  angle: 0
-};
+    const imageObj = new Image();
+    imageObj.src = image;
 
-let score = 0;
-let startTime = null;
-let startPosition = 0;
-let startAngle = 0;
-const baseSpeed = 3.0;
-const turnSpeed = 0.05;
-const tileSize = world.tileSize;
-
-function playerInit() {
-  startPosition = { x: 0, y: 0}; // Declared early to avoid ReferenceError
-  startAngle = Math.random() * 6;
-  setPlayerPositionAndAngle(startPosition.x, startPosition.y, startAngle);
-}
-
-function getStartPosition() {
-  return startPosition;
-}
-
-function setPlayerPositionAndAngle(x, y, theta) {
-  player.x = x;
-  player.y = y;
-  player.angle = theta % Math.PI;
-}
-
-function isUpsideDown() {
-  return Math.abs(player.angle) > Math.PI / 2;
-}
-
-function setPlayerAngle(theta){
-  player.angle = theta % (2 * Math.PI);
-  console.info(player.angle)
-}
-
-function setPlayerPosition(x, y){
-  player.x = x;
-  player.y = y;
-}
-
-function getPlayerX() {
-  return player.x;
-}
-
-function getPlayerY(){
-  return player.y;
-}
-
-function getPlayerAngle(){
-  return player.angle;
-}
-
-function turnPlayer(speed){
-  setPlayerAngle(player.angle + speed);
-}
-
-function getTileAtPlayer(){
-  return getTile(Math.floor(player.x / tileSize), Math.floor(player.y / tileSize));
-}
-
-function update() {
-  if (!startTime) startTime = Date.now();
-  const currentTime = (Date.now() - startTime) / 1000;
-
-  //Keyboard controls
-  if (keys['ArrowLeft']) turnPlayer(-turnSpeed);
-  if (keys['ArrowRight']) turnPlayer(turnSpeed);
-
-  // Mobile turning (horizontal axis of touch)
-  if (isTouching) {
-    // Rotation based on horizontal input only
-    const turnStrength = Math.sin(getTouchAngle()); // -1 to 1
-    turnPlayer(turnStrength * turnSpeed);
+    this.image = imageObj;
   }
 
-  let dx = 0, dy = 0;
-  let currentTile = getTileAtPlayer();
-  let currentSpeedModifier = currentTile.speed;
-  const actualSpeed = baseSpeed * currentSpeedModifier;
-
-  if (keys['ArrowUp'] || isTouching) {
-    const moveStrength = Math.cos(getTouchAngle()); // forward=1, backward=-1
-    const moveSpeed = actualSpeed * moveStrength * (getTouchDistance() || 1);
-    dx = Math.cos(player.angle - Math.PI / 2) * moveSpeed;
-    dy = Math.sin(player.angle - Math.PI / 2) * moveSpeed;
-  }
-  if (keys['ArrowDown']) {
-    dx = -Math.cos(player.angle - Math.PI / 2) * actualSpeed;
-    dy = -Math.sin(player.angle - Math.PI / 2) * actualSpeed;
+  move() {
+    this.x += Math.cos(this.angle - Math.PI / 2) * this.speed;
+    this.y += Math.sin(this.angle - Math.PI / 2) * this.speed;
   }
 
-  movePlayer(dx, dy);
-  if (getTileAtPlayer().impassable) movePlayer(-dx, -dy);
-
-  const nextCheckpoint = getCheckpoint(score);
-  if (nextCheckpoint) increaseIfCheckpointFound(nextCheckpoint);
-  
-  if (score==getCheckpointCount()) {
-    return true;
+  moveDistance(distance) {
+    this.x += Math.cos(this.angle - Math.PI / 2) * distance;
+    this.y += Math.sin(this.angle - Math.PI / 2) * distance;
   }
-  
-  updateNpcs(player.x, player.y);
 
-  return false;
-}
+  getX(){
+    return this.x;
+  }
 
-function increaseIfCheckpointFound(nextCheckpoint) {
-  const cx = nextCheckpoint.x * tileSize + tileSize / 2;
-  const cy = nextCheckpoint.y * tileSize + tileSize / 2;
-  const dist = Math.hypot(player.x - cx, player.y - cy);
-  if (dist < tileSize / 2) {
-    nextCheckpoint.found = true;
-    score++;
+  getY(){
+    return this.y;
+  }
+
+  getAngle(){
+    return this.angle;
   }
 }
 
-function movePlayer(dx, dy) {
-  player.x = player.x + dx;
-  player.y = player.y + dy;
-}
-
-export {
-  playerInit,
-  update,
-  getPlayerX,
-  getPlayerY,
-  getPlayerAngle,
-  getStartPosition,
-  isUpsideDown
-};
-
+export default Player;

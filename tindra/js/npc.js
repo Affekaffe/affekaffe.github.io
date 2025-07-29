@@ -1,47 +1,50 @@
-import {getCanvas} from './ui.js';
+class Npc {
+  constructor({name, image, speed = 1}) {
+    this.name = name;
+    this.speed = speed;
+    this.x = null;
+    this.y = null;
+    this.angle = null;
 
-let activeNPC = null;
-let npcTimer = 0;
-const canvas = getCanvas();
+    const imageObj = new Image();
+    imageObj.src = image;
 
-function updateNpcs(pX, pY) {
-  // Countdown to spawn NPC
-  npcTimer -= 1 / 60;
-  
-  if (!activeNPC && npcTimer <= 0) {
-    // Spawn NPC
-    const fromLeft = Math.random() < 0.5;
-    const y = pY + (Math.random() * 400 - 200); // +/- 200px vertically
-    activeNPC = {
-      x: pX + (fromLeft ? -canvas.width / 2 - 100 : canvas.width / 2 + 100),
-      y: pY,
-      angle: fromLeft ? 0 : Math.PI,
-      speed: 4 + Math.random() * 2,
-      direction: fromLeft ? 1 : -1
-    };
-  
-    // Set next spawn timer (10–30 sec)
-    npcTimer = 10 + Math.random() * 15;
+    this.image = imageObj;
   }
-  
-  // Move NPC
-  moveNpc(activeNPC, pX, pY);
-}
-function moveNpc(npc, pX, pY) {
-  if (npc) {
-    npc.x += npc.direction * npc.speed;
 
-    // Despawn when far from player view
-    if (Math.abs(npc.x - pX) > canvas.width) {
-      npc = null;
-    }
+  move() {
+    this.x += Math.cos(this.angle - Math.PI / 2) * this.speed;
+    this.y += Math.sin(this.angle - Math.PI / 2) * this.speed;
+  }
+
+  moveDistance(distance) {
+    this.x += Math.cos(this.angle - Math.PI / 2) * distance;
+    this.y += Math.sin(this.angle - Math.PI / 2) * distance;
+  }
+
+  spawn(x, y, angle) {
+    this.x = x;
+    this.y = y;
+    this.angle = angle;
+  }
+
+  despawn(){
+    this.x = null;
+    this.y = null;
+    this.angle = null;
+  }
+
+  getX(){
+    return this.x;
+  }
+
+  getY(){
+    return this.y;
+  }
+
+  getAngle(){
+    return this.angle;
   }
 }
 
-function getActiveNpc(){
-  return activeNPC;
-}
-
-export { updateNpcs,
-  getActiveNpc
-};
+export default Npc;

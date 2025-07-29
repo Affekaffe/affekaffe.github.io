@@ -1,54 +1,48 @@
 import Tile from './tile.js';
+import { game } from './gameConfig.js';
 
-const lightRadius = 6;
-const tileSize = window.innerHeight / (2 * lightRadius); //pixels
-const chunkSize = 10; //tiles
-const mapSize = 30; //tiles
+const chunkSize = game.chunkSize; //tiles
 
-let world = {tileSize: tileSize, chunkSize: chunkSize, mapSize: mapSize, lightRadius: lightRadius};
 let terrainChunks = new Map();
-let tiles = tilesInit();
+let tiles = new Map();
 
-function tilesInit() {
-  const tilesToReturn = {
-    ground: new Tile({
-      name: 'ground',
-      color: '#ccffcc',
-      image: './assets/ground1.png'
+function loadTiles() {
+  tiles['ground'] = new Tile({
+    name: 'ground',
+    color: '#ccffcc',
+    image: './assets/ground1.png'
+  });
+
+  tiles['tree'] = new Tile({
+    name: 'tree',
+    color: '#85FF66',
+    image: './assets/tree1.png',
+    speed: 0.4,
+    semiBlocksLight: true
+  });
+
+  tiles['building'] = new Tile({
+    name: 'building',
+    color: '#222',
+    image: './assets/building1.png',
+    speed: 0,
+    impassable: true,
+    blocksLight: true
+  });
+
+  tiles['open'] = new Tile({
+    name: 'open',
+    color: '#FFBA36',
+    image: './assets/open1.png',
+    speed: 1.5
   }),
 
-    tree: new Tile({
-      name: 'tree',
-      color: '#85FF66',
-      image: './assets/tree1.png',
-      speed: 0.4,
-      semiBlocksLight: true
-  }),
-
-    building: new Tile({
-      name: 'building',
-      color: '#222',
-      image: './assets/building1.png',
-      speed: 0,
-      impassable: true,
-      blocksLight: true
-  }),
-
-    open: new Tile({
-      name: 'open',
-      color: '#FFBA36',
-      image: './assets/open1.png',
-      speed: 1.5
-  }),
-
-    water: new Tile({
+  tiles['water'] = new Tile({
       name: 'water',
       color: '#00FFFF',
       image: './assets/water1.png',
       speed: 0.1
-  })
-  };
-  return tilesToReturn;
+  });
 }
 
 function getTile(x, y) {
@@ -145,8 +139,7 @@ function generateChunk(cx, cy) {
 }
 
 
-export {world, 
-  generateChunk, 
+export {generateChunk, 
   getTile,
-  tilesInit
+  loadTiles
 };

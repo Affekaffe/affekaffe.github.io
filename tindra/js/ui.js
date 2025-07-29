@@ -1,22 +1,26 @@
-const canvas = document.getElementById('game');
-const ctx = canvas.getContext('2d');
-const minimapCanvas = document.getElementById('minimap');
-const minimapCtx = minimapCanvas.getContext('2d');
 
 function getCanvas() {
-  return canvas;
+  return document.getElementById('game');
 }
 
 function getCtx() {
-  return ctx;
+  return getCanvas().getContext('2d');
+}
+
+function getMaskCanvas() {
+  return document.getElementById('mask');
+}
+
+function getMaskCtx() {
+  return getMaskCanvas().getContext('2d');
 }
 
 function getMinimapCanvas() {
-  return minimapCanvas;
+  return document.getElementById('minimap');
 }
 
 function getMinimapCtx() {
-  return minimapCtx;
+  return getMinimapCanvas().getContext('2d');
 }
 
 function showEndScreen() {
@@ -69,6 +73,8 @@ export {getCanvas,
   getCtx,
   getMinimapCanvas,
   getMinimapCtx,
+  getMaskCanvas,
+  getMaskCtx,
   showEndScreen
 };
 

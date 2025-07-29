@@ -1,8 +1,9 @@
-import { world, getTile } from "./terrain.js";
+import { game } from "./gameConfig.js";
+import { getTile } from "./terrain.js";
 import { generateChunk } from "./terrain.js";
 
-const mapSize = world.mapSize;
-const chunkSize = world.chunkSize;
+const mapSize = game.mapSize;
+const chunkSize = game.chunkSize;
 
 let checkpoints = [];
 

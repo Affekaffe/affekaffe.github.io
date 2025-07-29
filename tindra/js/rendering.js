@@ -1,16 +1,17 @@
-import { getCanvas, getCtx, getMinimapCanvas, getMinimapCtx } from "./ui.js";
-import { world, getTile } from "./terrain.js";
-import { getActiveNpc } from "./npc.js";
-import { getPlayerX, getPlayerY, getPlayerAngle, getStartPosition, isUpsideDown } from "./player.js";
+import { getCanvas, getCtx, getMaskCanvas, getMaskCtx, getMinimapCanvas, getMinimapCtx } from "./ui.js";
+import { getTile} from "./terrain.js";
+import { getActiveNpc } from "./npcHandler.js";
+import { getPlayerX, getPlayerY, getPlayerAngle, getStartPosition, getFlashlightStrength } from "./playerHandler.js";
 import { getCheckpoints } from "./checkpoints.js";
 import { minimapVisible } from "./input.js";
+import { game } from "./gameConfig.js";
 
 const canvas = getCanvas();
 const ctx = getCtx();
 const minimapCanvas = getMinimapCanvas();
 const minimapCtx = getMinimapCtx();
-const tileSize = world.tileSize;
-const imageSize = tileSize; 
+const maskCanvas = getMaskCanvas();
+const maskCtx = getMaskCtx();
 
 const playerImage = new Image();
 playerImage.src = './assets/player.png';
@@ -19,53 +20,44 @@ npc1.src = './assets/npc1.png';
 const tileBackgroundImage = new Image();
 tileBackgroundImage.src = './assets/base1.png';
 
-const lightRadiusTiles = world.lightRadius; //tiles
+const lightRadiusTiles = game.lightRadius; //tiles
 
-function drawWorld(gameMode) {
-  const pX = getPlayerX();
-  const pY = getPlayerY();
+function drawWorld() {
+  const imageSize = game.tileSize;
   const pAngle = getPlayerAngle();
   const checkpoints = getCheckpoints();
-  const lightRadius = lightRadiusTiles * tileSize;
+
+  drawTerrain();
+  
+  drawPlayer(playerImage, imageSize);
+  if (getActiveNpc()) drawNpc(getActiveNpc(), imageSize);
+
+  drawLighting();
+
+  drawCompass(pAngle);
+  drawMinimapIfVisible(checkpoints);
+}
+
+function drawTerrain() {
+  const worldX = getPlayerX();
+  const worldY = getPlayerY();
+  const worldRotation = getPlayerAngle();
 
   ctx.save();
   ctx.translate(canvas.width / 2, canvas.height / 2);
-  ctx.rotate(-pAngle);
-  ctx.translate(-pX, -pY);
+  ctx.rotate(-worldRotation);
+  ctx.translate(-worldX, -worldY);
 
-  const minX = Math.floor((pX - lightRadius) / tileSize) - 1;
-  const maxX = Math.floor((pX + lightRadius) / tileSize) + 1;
-  const minY = Math.floor((pY - lightRadius) / tileSize) - 1;
-  const maxY = Math.floor((pY + lightRadius) / tileSize) + 1;
+  drawTiles(worldX, worldY, getRenderDistance());
+  drawCheckpoints();
 
-for (let y = minY; y <= maxY; y++) {
-  for (let x = minX; x <= maxX; x++) {
-    const tile = getTile(x, y);
-    const centerX = x * tileSize + tileSize / 2;
-    const centerY = y * tileSize + tileSize / 2;
-
-    if (tileBackgroundImage) {
-        ctx.drawImage(
-        tileBackgroundImage,
-        x * tileSize,
-        y * tileSize,
-        tileSize,
-        tileSize
-      );
-    }
-    if (tile.image) {
-      ctx.drawImage(
-        tile.image,
-        x * tileSize,
-        y * tileSize,
-        tileSize,
-        tileSize
-      );
-    }
-  }
+  ctx.restore();
 }
 
-  checkpoints.forEach(cp => {
+function drawCheckpoints() {
+  const tileSize = game.tileSize;
+
+  getCheckpoints().forEach(cp => {
     if (!cp.found) {
       ctx.fillStyle = 'red';
       ctx.beginPath();
@@ -73,103 +65,215 @@ for (let y = minY; y <= maxY; y++) {
       ctx.fill();
     }
   });
+}
 
-  ctx.restore();
-  
+function drawTiles(centerX, centerY, radius) {
+  const tileSize = game.tileSize;
+
+  const minX = Math.floor((centerX - radius) / tileSize) - 1;
+  const maxX = Math.floor((centerX + radius) / tileSize) + 1;
+  const minY = Math.floor((centerY - radius) / tileSize) - 1;
+  const maxY = Math.floor((centerY + radius) / tileSize) + 1;
+
+  for (let y = minY; y <= maxY; y++) {
+    for (let x = minX; x <= maxX; x++) {
+      const tile = getTile(x, y);
+
+      drawBackgroundTile(x, y, tileSize);
+      drawTile(tile, x, y, tileSize);
+    }
+  }
+}
+
+function drawLighting() {
+  const lightRadius = getRenderDistance();
+
+  if (game.gameMode === "normal") {
+    drawGradient(ctx, 'rgba(255, 255, 255, 0)', 'rgba(0, 0, 0, 1)', lightRadius);  
+  }
+  else if (game.gameMode === "night") {
+    drawGradient(ctx, 'rgba(0, 0, 0, 0.1)', 'rgba(0, 0, 0, 1)', lightRadius);
+    drawAllNightMasks(getActiveNpc())
+  }
+}
+
+function drawTile(tile, x, y, tileSize) {
+  if (tile.image) {
+    ctx.drawImage(
+      tile.image,
+      x * tileSize,
+      y * tileSize,
+      tileSize,
+      tileSize
+    );
+  }
+}
+
+function drawBackgroundTile(x, y, tileSize) {
+  if (tileBackgroundImage) {
+    ctx.drawImage(
+      tileBackgroundImage,
+      x * tileSize,
+      y * tileSize,
+      tileSize,
+      tileSize
+    );
+  }
+}
+
+function drawPlayer(playerImage, imageSize) {
   ctx.save();
   ctx.translate(canvas.width / 2, canvas.height / 2);
   ctx.drawImage(playerImage, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
   ctx.restore();
-  
-  drawNpc();
-
-  if(gameMode==="normal"){
-    drawGradient(lightRadius);
-  }
-  else {
-    drawFlashlight(pX, pY, pAngle, lightRadius);
-  }
-
-  drawCompass(pAngle);
-  drawMinimapIfVisible(checkpoints);
 }
 
-function drawNpc() {
-  const npc = getActiveNpc();
-  if (npc) {
+function drawNpc(npc, imageSize) {
+  const worldX = getPlayerX();
+  const worldY = getPlayerY();
+  const worldAngle = getPlayerAngle();
+
+  const npcX = npc.getX();
+  const npcY = npc.getY();
+  const npcAngle = npc.getAngle();
+
+  if (npc.image) {
     ctx.save();
-    ctx.translate(npc.x, npc.y);
-    ctx.rotate(npc.angle);
-    ctx.drawImage(npc1, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(-worldAngle);
+    ctx.translate(npcX - worldX, npcY - worldY);
+    ctx.rotate(npcAngle);
+    ctx.drawImage(npc.image, -imageSize/2, -imageSize/2, imageSize, imageSize);
+
     ctx.restore();
   }
 }
 
-function drawGradient(lightRadius) {
-    const px = canvas.width / 2;
-    const py = canvas.height / 2;
+function drawGradient(_ctx, c1, c2, lightRadius) {
+    const gradient = createGradient(c1, c2, lightRadius);
 
-    const gradient = ctx.createRadialGradient(px, py, 0, px, py, lightRadius);
-    gradient.addColorStop(0, 'rgba(255, 255, 255, 0)');
-    gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
-
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    _ctx.fillStyle = gradient;
+    _ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 
-function drawFlashlight(pX, pY, pAngle, lightRadius) {
-  const beamAngle = 2 * Math.PI / 3;
-  const px = canvas.width / 2;
-  const py = canvas.height / 2;
+function createGradient(c1, c2, lightRadius) {
+  const width = canvas.width;
+  const height = canvas.height;
 
-  const gradient = ctx.createRadialGradient(px, py, 0, px, py, lightRadius);
-  gradient.addColorStop(0, 'rgba(0, 0, 0, 0.1)');
-  gradient.addColorStop(1, 'rgba(0, 0, 0, 1)');
+  ctx.resetTransform();
+  const gradient = ctx.createRadialGradient(width / 2, height / 2, 0, width / 2, height / 2, lightRadius);
+  gradient.addColorStop(0, c1);
+  gradient.addColorStop(1, c2);
 
-  const maskCanvas = document.createElement('canvas');
-  maskCanvas.width = canvas.width;
-  maskCanvas.height = canvas.height;
-  const maskCtx = maskCanvas.getContext('2d');
+  return gradient;
+}
+
+function drawDarknessMask() {
+  const width = canvas.width;
+  const height = canvas.height;
 
   maskCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
-  maskCtx.fillRect(0, 0, canvas.width, canvas.height);
+  maskCtx.fillRect(0, 0, width, height);
+}
+
+function drawAllNightMasks(npc) {
+  const lightRadius = getRenderDistance();
+
+  ctx.save();
+  maskCtx.save();
+
+  drawDarknessMask();
+  drawFlashlightMasks(npc);
+  drawGradient(maskCtx, 'rgba(0, 0, 0, 0.1)', 'rgba(0, 0, 0, 0)', lightRadius * getFlashlightStrength())
+
+  ctx.drawImage(maskCanvas, 0, 0);
+  ctx.restore();
+  maskCtx.restore();
+}
+
+function drawFlashlightMasks(npc) {
+  const strength = getFlashlightStrength();
 
   maskCtx.globalCompositeOperation = 'destination-out';
+  
+  drawFlashlightMaskAtPlayer(strength);
+  if (npc) drawFlashlightMaskAtNpc(npc, strength * 2);
+}
+
+function drawFlashlightMaskAtNpc(npc, strength) {
+  const x = npc.getX();
+  const y = npc.getY();
+  const angle = npc.getAngle();
+  const lightRadius = getRenderDistance();
+
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  ctx.rotate(-getPlayerAngle());
+  ctx.translate(x - getPlayerX(), y - getPlayerY());
+  ctx.rotate(angle);
+
+
+  maskCtx.setTransform(ctx.getTransform());
+
+  drawFlashlightBeams(x, y, angle, lightRadius * strength);
+  ctx.resetTransform();
+  maskCtx.resetTransform();
+}
+
+function drawFlashlightMaskAtPlayer(strength) {
+  const x = getPlayerX();
+  const y = getPlayerY();
+  const angle = getPlayerAngle();
+  const lightRadius = getRenderDistance();
+
+  ctx.translate(canvas.width / 2, canvas.height / 2);
+  
+  maskCtx.setTransform(ctx.getTransform());
+
+  drawFlashlightBeams(x, y, angle, lightRadius * strength);
+  ctx.resetTransform();
+  maskCtx.resetTransform();
+}
+
+function drawFlashlightBeams(x, y, angle, length) {
+  const offset = 30;
+  maskCtx.translate(0, offset);
+  const beamAngle = 2 * Math.PI / 3;
+  
+  const gradient = maskCtx.createRadialGradient(0, 0, length * 0.1, 0, 0, length);
+  gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+  gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+
+  maskCtx.fillStyle = gradient;
+
   maskCtx.beginPath();
-  maskCtx.moveTo(px, py);
+  maskCtx.moveTo(0, 0);
 
   for (let a = -beamAngle / 2; a <= beamAngle / 2; a += 0.03) {
-    const screenAngle = -Math.PI / 2 + a;
-    const worldAngle = screenAngle + pAngle;
-    const dist = castRayWorld(pX, pY, worldAngle, lightRadius);
-    const rx = px + Math.cos(screenAngle) * dist;
-    const ry = py + Math.sin(screenAngle) * dist;
+    const singleBeamAngle = -Math.PI / 2 + a;
+    const NetBeamAngle = singleBeamAngle + angle;
+    const dist = castRayWorld(x, y, NetBeamAngle, length);
+    const rx = Math.cos(singleBeamAngle) * dist;
+    const ry = Math.sin(singleBeamAngle) * dist;
     maskCtx.lineTo(rx, ry);
   }
 
   maskCtx.closePath();
   maskCtx.fill();
-
-  maskCtx.globalCompositeOperation = 'hue';
-  maskCtx.fillStyle = gradient;
-  maskCtx.fillRect(0, 0, canvas.width, canvas.height);
-
-  ctx.drawImage(maskCanvas, 0, 0);
 }
 
-function castRayWorld(pX, pY, angle, maxDist) {
+function castRayWorld(x, y, angle, maxDist) {
   const step = 4;
   let accumulatedOpacity = 0;
   for (let d = 0; d < maxDist; d += step) {
-    const wx = pX + Math.cos(angle) * d;
-    const wy = pY + Math.sin(angle) * d;
-    const tileX = Math.floor(wx / tileSize);
-    const tileY = Math.floor(wy / tileSize);
+    const wx = x + Math.cos(angle) * d;
+    const wy = y + Math.sin(angle) * d;
+    const tileX = Math.floor(wx / game.tileSize);
+    const tileY = Math.floor(wy / game.tileSize);
     const tile = getTile(tileX, tileY);
 
     if (tile.blocksLight) return d;
     if (tile.semiBlocksLight) {
-      accumulatedOpacity += 0.1;
+      accumulatedOpacity += 0.08;
       if (accumulatedOpacity >= 1) return d;
     }
   }
@@ -219,6 +323,7 @@ function drawMinimapIfVisible(checkpoints) {
 }
 
 function drawMinimap(checkpoints) {
+  const tileSize = game.tileSize;
   const startPosition = getStartPosition();
 
   const scale = 8; // 2x size tiles
@@ -295,24 +400,41 @@ function clearScreen() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }  
 
+function resizeAllCanvas(){
+  game.tileSize = window.innerHeight / (2 * game.lightRadius);
+
+  resizeCanvas();
+  resizeMask();
+  resizeMinimap();
+}
+
 function resizeMinimap() {
   minimapCanvas.width = window.innerWidth;
   minimapCanvas.height = window.innerHeight;
 }
 
 function resizeCanvas() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+
+function resizeMask() {
+  maskCanvas.width = canvas.width;
+  maskCanvas.height = canvas.height;
+}
+
+function getRenderDistance(){
+  return lightRadiusTiles * game.tileSize;
 }
 
 
 
 export{drawWorld,
-  drawFlashlight,
+  drawFlashlightMaskAtPlayer as drawFlashlight,
   drawGradient,
   drawMinimapIfVisible,
   drawCompass,
   clearScreen,
-  resizeCanvas,
-  resizeMinimap
+  resizeAllCanvas,
+  getRenderDistance
 };
