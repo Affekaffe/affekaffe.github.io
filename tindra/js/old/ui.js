@@ -1,27 +1,9 @@
-
-function getCanvas() {
-  return document.getElementById('game');
-}
-
-function getCtx() {
-  return getCanvas().getContext('2d');
-}
-
-function getMaskCanvas() {
-  return document.getElementById('mask');
-}
-
-function getMaskCtx() {
-  return getMaskCanvas().getContext('2d');
-}
-
-function getMinimapCanvas() {
-  return document.getElementById('minimap');
-}
-
-function getMinimapCtx() {
-  return getMinimapCanvas().getContext('2d');
-}
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const minimapCanvas = document.getElementById('minimap');
+const minimapCtx = minimapCanvas.getContext('2d');
+const maskCanvas = document.getElementById('mask');
+const maskCtx = maskCanvas.getContext('2d');
 
 function showEndScreen() {
   const endScreen = document.getElementById('end-screen');
@@ -69,12 +51,13 @@ function startConfetti() {
   draw();
 }
 
-export {getCanvas,
-  getCtx,
-  getMinimapCanvas,
-  getMinimapCtx,
-  getMaskCanvas,
-  getMaskCtx,
+export {
+  canvas,
+  ctx,
+  minimapCanvas,
+  minimapCtx,
+  maskCanvas,
+  maskCtx,
   showEndScreen
 };
 

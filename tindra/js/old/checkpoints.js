@@ -1,4 +1,4 @@
-import { game } from "./gameConfig.js";
+import { game } from "../config.js";
 import { getTile } from "./terrain.js";
 import { generateChunk } from "./terrain.js";
 
@@ -48,7 +48,7 @@ function getCheckpoint(number){
 }
 
 function getCheckpoints(){
-  return checkpoints
+  return checkpoints;
 }
 
 function getCheckpointCount(){

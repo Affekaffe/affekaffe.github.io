@@ -7,29 +7,14 @@
 </head>
 <body>
   <h1>Tindra Lost In The Woods</h1>
-  <div id="info">Time: <span id="timer">0.0</span> s | Checkpoints: <span id="score">0</span></div>
-
-  <div id="joystick-base">
-    <div id="joystick-thumb"></div>
-  </div>
-
-  <button id="map-toggle">Map</button>
-  <div id="start-screen">
-    <h2>Tindra Lost In The Woods</h2>
-    <button id="normal-button" class=start-button>Normal</button>
-    <button id="night-button" class=start-button>Night</button>
-  </div>
-  
   <div id="end-screen" style="display: none;">
     <h2>You made it. 💀</h2>
     <canvas id="confetti-canvas"></canvas>
   </div>
 
-  <canvas id="game"></canvas>
-  <canvas id="minimap"></canvas>
-  <canvas id="mask"></canvas>
+  <canvas id="game" width="800" height="600"></canvas>
 
   <!-- Scripts -->
-  <script type="module" src="js/main.js"></script>
+  <script type="module" src="js/newMain.js"></script>
 </body>
 </html>

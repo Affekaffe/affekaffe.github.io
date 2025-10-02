@@ -1,21 +1,19 @@
-import {getCanvas} from './ui.js';
 import Npc from './npc.js';
-import { getPlayerX, getPlayerY } from './playerHandler.js';
+import { player } from './playerHandler.js';
 import { getRenderDistance } from './rendering.js';
 
 let activeNpc = null;
 let npcLife = 0;
 let npcTimer = 10;
-const canvas = getCanvas();
 let npcs = [];
 
 function loadNpcs(){
 npcs.push(
-  new Npc({
-    name: 'G. Bergman',
-    image: './assets/npc1.png',
-    speed: 4
-  })
+  new Npc(
+    'G. Bergman',
+    './assets/npc1.png',
+    4
+  )
   );
 }
 
@@ -34,15 +32,15 @@ function updateNpcs() {
 function updateNpc() {
   activeNpc.move();
 
-  const isOutside = (Math.abs(activeNpc.getX() - getPlayerX()) > getRenderDistance() || Math.abs(activeNpc.getY() - getPlayerY()) > getRenderDistance()); 
+  const isOutside = (Math.abs(activeNpc.x - player.x) > getRenderDistance() || Math.abs(activeNpc.y - player.y) > getRenderDistance()); 
   if (isOutside && npcLife <= 0) {
     activeNpc = null;
   }
 }
 
 function spawnRandomNpc(radius) {
-  const spawnX = getPlayerY();
-  const spawnY = getPlayerY();
+  const spawnX = player.x;
+  const spawnY = player.y;
   const spawnAngle = Math.random() * 2 * Math.PI;
   activeNpc = npcs[0];
   activeNpc.spawn(spawnX, spawnY, spawnAngle);

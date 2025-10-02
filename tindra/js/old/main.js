@@ -1,14 +1,13 @@
 import { clearScreen, drawWorld, resizeAllCanvas} from './rendering.js';
-import { update, playerInit } from './playerHandler.js';
+import { update, playerInit, player } from './playerHandler.js';
 import { isMobileDevice } from './utils.js';
 import { inputInit, keys } from './input.js';
 import { generateRandomCheckpoints } from './checkpoints.js';
 import { generateChunk, loadTiles } from './terrain.js';
 import { showEndScreen } from './ui.js';
 import { loadNpcs } from './npcHandler.js';
-import { gameInit, game } from './gameConfig.js';
-
-const checkpointCount = 8;
+import { gameInit, game } from '../config.js';
+import DrawHandler from '../drawHandler.js';
 
 async function startGame() {
   document.getElementById('start-screen').style.display = 'none';
@@ -26,11 +25,11 @@ async function startGame() {
 }
 
 function gameLoop() {
-  const gameOver = game.gameOver;
-  if (!gameOver) {
+  if (!game.gameOver) {
     update();
     clearScreen();
-    drawWorld();
+    DrawHandler.instance.drawAll(player);
+    //drawWorld();
     requestAnimationFrame(gameLoop);
   } else {
     showEndScreen();
@@ -39,12 +38,12 @@ function gameLoop() {
 
 window.onload = () => {
   gameInit();
+  playerInit();
   loadTiles();
   loadNpcs();
   generateChunk(0, 0);
-  generateRandomCheckpoints(checkpointCount);
+  generateRandomCheckpoints(game.checkpointCount);
   resizeAllCanvas();
-  playerInit();
   inputInit();
 }
 

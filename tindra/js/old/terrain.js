@@ -1,5 +1,5 @@
 import Tile from './tile.js';
-import { game } from './gameConfig.js';
+import { game } from '../config.js';
 
 const chunkSize = game.chunkSize; //tiles
 
@@ -7,42 +7,43 @@ let terrainChunks = new Map();
 let tiles = new Map();
 
 function loadTiles() {
-  tiles['ground'] = new Tile({
-    name: 'ground',
-    color: '#ccffcc',
-    image: './assets/ground1.png'
-  });
+  tiles['ground'] = new Tile(
+    'ground',
+    '#ccffcc',
+    './assets/ground1.png'
+  );
 
-  tiles['tree'] = new Tile({
-    name: 'tree',
-    color: '#85FF66',
-    image: './assets/tree1.png',
-    speed: 0.4,
-    semiBlocksLight: true
-  });
+  tiles['tree'] = new Tile(
+    'tree',
+    '#85FF66',
+    './assets/tree1.png',
+    0.4,
+    false,
+    false,
+    true
+  );
 
-  tiles['building'] = new Tile({
-    name: 'building',
-    color: '#222',
-    image: './assets/building1.png',
-    speed: 0,
-    impassable: true,
-    blocksLight: true
-  });
+  tiles['building'] = new Tile(
+    'building',
+    '#222',
+    './assets/building1.png',
+    0,
+    true,
+    true
+  );
 
-  tiles['open'] = new Tile({
-    name: 'open',
-    color: '#FFBA36',
-    image: './assets/open1.png',
-    speed: 1.5
-  }),
+  tiles['open'] = new Tile(
+    'open',
+    '#FFBA36',
+    './assets/open1.png',
+    1.5
+  ),
 
-  tiles['water'] = new Tile({
-      name: 'water',
-      color: '#00FFFF',
-      image: './assets/water1.png',
-      speed: 0.1
-  });
+  tiles['water'] = new Tile('water',
+    '#00FFFF',
+    './assets/water1.png',
+     0.1
+  );
 }
 
 function getTile(x, y) {

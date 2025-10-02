@@ -1,5 +1,5 @@
 class Tile {
-  constructor({name, color, image, speed = 1, impassable = false, blocksLight = false, semiBlocksLight = false}) {
+  constructor(name, color, image, speed = 1, impassable = false, blocksLight = false, semiBlocksLight = false) {
     this.name = name;
     this.color = color;
     this.speed = speed;
