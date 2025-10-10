@@ -1,0 +1,179 @@
+/* =======================
+   Global Reset
+======================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: sans-serif;
+}
+
+/* =======================
+   App Container
+======================= */
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* =======================
+   Controls
+======================= */
+#controls {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 10px;
+  background-color: #111111;
+  border-bottom: 1px solid #222222;
+}
+
+/* Matrix Inputs */
+#matrix-input {
+  display: grid;
+  grid-template-columns: repeat(2, 70px);
+  grid-gap: 5px;
+}
+
+#matrix-input-container {
+  font-size: 18px;      
+  font-weight: bold;
+  display: flex;         
+  align-items: center;   
+  gap: 10px;        
+  color: #cccccc;      
+}
+
+#matrix-input input {
+  width: 70px;
+  padding: 5px;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+/* Slider */
+#slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+#transform-slider {
+  width: 200px;
+}
+
+/* =======================
+   Canvas Container
+======================= */
+#canvas-container {
+  flex: 1; /* take remaining vertical space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #111111;
+  overflow: hidden;
+}
+
+canvas#view {
+  width: 100%;
+  height: 100%;
+  display: block;
+  background-color: #111111;
+  border: 1px solid #222222;
+}
+#slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px; 
+}
+
+#object-control-container {
+  margin-left: 40px;
+}
+
+.button-control {
+  width: 40px;
+  height: 40px;
+  font-size: 18px;      
+  font-weight: bold;
+  color: #cccccc;          
+  background-color: green; 
+  border: 2px solid #111111;
+  border-radius: 5px;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.button-control:hover {
+  background-color: #006600; 
+}
+
+.reset-button {
+  color: #222222;
+  background-color: #cccccc;
+}
+
+.reset-button:hover {
+  background-color: #aaaaaa; 
+}
+
+.add-vector-button {
+  width: auto;
+}
+
+.clear-vector-button {
+  width: auto;
+  color: #cccccc;
+  background-color: #992222;
+}
+
+.clear-vector-button:hover {
+  background-color: #772222; 
+}
+
+#vector-labels {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none; 
+}
+
+.vector-label {
+  position: absolute;
+  color: #cccccc;
+  font-weight: bold;
+  font-size: 30px;
+    text-shadow:
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000;
+  transform: translate(-0%, -0%);
+  user-select: none;
+}
+
+#controls {
+  position: relative; /* make this the reference for absolute positioning */
+}
+
+#vector-coords {
+  position: absolute;      /* overlay relative to #controls */
+  top: 100%;               /* right below the matrix inputs */
+  left: 0;                 /* align to the left of #controls */
+  width: auto;             /* don’t stretch full width */
+  max-width: 200px;        /* optional, safety limit */
+  color: white;
+  font-family: monospace;
+  font-size: 14px;
+  font-weight: 150;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-left: 10px;
+  vertical-align: top;
+}
