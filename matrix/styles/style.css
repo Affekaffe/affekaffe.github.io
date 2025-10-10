@@ -156,19 +156,24 @@ canvas#view {
   user-select: none;
 }
 
+#controls {
+  position: relative; /* make this the reference for absolute positioning */
+}
+
+
 #vector-coords {
-  position: absolute;
-  top: 10px;           /* distance from top of canvas container */
-  left: 10px;          /* distance from left of canvas container */
-  width: auto;
-  max-width: 200px;
+  position: absolute;      /* overlay relative to #controls */
+  top: 100%;               /* right below the matrix inputs */
+  left: 0;                 /* align to the left of #controls */
+  width: auto;             /* don’t stretch full width */
+  max-width: 200px;        /* optional, safety limit */
   color: white;
   font-family: monospace;
   font-size: 14px;
-  font-weight: 150;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   padding: 10px;
   border-radius: 8px;
-  margin-top: 100px;
-  z-index: 10;
+  margin-top: 10px;
+  margin-left: 10px;
+  vertical-align: top;
 }
