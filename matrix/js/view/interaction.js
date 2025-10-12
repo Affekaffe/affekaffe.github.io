@@ -30,7 +30,6 @@ class Interaction {
   }
 
   handleDragStart(event) {
-    console.log(event);
     const mousePosCanvasCoords = this._getCanvasOffset(event, this.view.canvas);
     const mousePos = this.view.fromCanvasCoords(mousePosCanvasCoords.x, mousePosCanvasCoords.y);
     this.draggingVector = null
@@ -40,7 +39,7 @@ class Interaction {
       const vector = styledV.vector2;
 
       const distanceToVector = mousePos.subtract(vector).length();
-      if (distanceToVector < touchThreshold / this.view.zoom) {
+      if (distanceToVector < this.getCorrectedTouchThreshold()) {
         this.draggingVector = styledV;
         break;
       }
@@ -95,7 +94,11 @@ class Interaction {
     x: e.clientX - rect.left,
     y: e.clientY - rect.top
   };
-}
+  }
+
+  getCorrectedTouchThreshold(){
+    return touchThreshold / this.view.zoom
+  }
 }
 
 export default Interaction;

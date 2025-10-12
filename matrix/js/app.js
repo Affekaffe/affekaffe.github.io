@@ -18,6 +18,7 @@ class App {
     this.input.initUI();
     this.view.initCanvas();
     this.interaction.setupEvents();
+    this.update();
 
     this.input.onChange = () => {
       this.update();

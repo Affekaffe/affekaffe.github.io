@@ -317,6 +317,17 @@ class CoordinateView {
     return color;
   }
 
+  _calcBaseVectorFrom(v){
+    let baseV;
+      const inv = this.transformationMatrix.inv()
+      if (!inv.isInf()) {
+        baseV = inv.matmul(v);
+      } else {
+        baseV = new Vector2(1, 1);
+      }
+      return baseV;
+    }
+
 updateVectorList() {
   const list = document.getElementById("vector-list");
   if (!list) return;
@@ -348,26 +359,16 @@ updateVectorList() {
 
       const [xInput, yInput] = li.querySelectorAll("input");
 
-      xInput.addEventListener("input", () => {
-        styled.vector2.x = parseFloat(xInput.value);
-        const inv = this.matrix_t.inv()
-        if (!inv.isInf()) {
-          styled.baseVector.x = inv.matmul(styled.vector2.x);
-        } else {
-          styled.baseVector.x = parseFloat(1);
-        }
-        this.draw();
+      xInput.addEventListener("change", () => {
+        const inputVector = new Vector2(parseFloat(xInput.value), parseFloat(yInput.value));
+        styled.baseVector = this._calcBaseVectorFrom(inputVector);
+        this.update();
       });
 
-      yInput.addEventListener("input", () => {
-        styled.vector2.y = parseFloat(yInput.value);
-        const inv = this.matrix_t.inv()
-        if (!inv.isInf()) {
-          styled.baseVector.y = inv.matmul(styled.vector2.y);
-        } else {
-          styled.baseVector.y = parseFloat(1);
-        }
-        this.draw();
+      yInput.addEventListener("change", () => {
+        const inputVector = new Vector2(parseFloat(xInput.value), parseFloat(yInput.value));
+        styled.baseVector = this._calcBaseVectorFrom(inputVector);
+        this.update();
       });
     }
 
