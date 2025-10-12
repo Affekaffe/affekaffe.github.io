@@ -214,10 +214,48 @@ canvas#view {
   margin-right: 10px;
 }
 
+#vector-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;            
+}
+
+
+#toggle-added-vectors {
+  background: none;
+  border: none;
+  color: #ccc;          
+  font-size: 18px;       
+  cursor: pointer;
+  padding: 0;
+  margin-left: 5px;     
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+#toggle-added-vectors::after {
+  content: "▲";        
+  display: inline-block;
+  font-size: 18px;
+  color: #ccc;          
+  transition: transform 0.2s;
+}
+
+#toggle-added-vectors.hidden {
+  display: none;
+}
+
+
+#toggle-added-vectors.active::after {
+  transform: rotate(180deg);
+}
+
 @media (max-width: 775px) {
   #controls {
     display: flex;
-    flex-direction: column; /* keep slider below */
+    flex-direction: column; 
     gap: 10px;
   }
 
@@ -226,7 +264,6 @@ canvas#view {
     flex-direction: row;
   }
 
-  /* Row for matrix + buttons */
   #matrix-input-and-buttons {
     display: flex;
     align-items: center;

@@ -5,6 +5,7 @@ class InputPanel {
     this.app = app;
     this.matrix = Matrix2.identity()
     this.sliderValue = 1;
+    this.showAddedVectors = true; 
     this.onChange = null; // callback to notify App
   }
 
@@ -68,6 +69,14 @@ class InputPanel {
       this.matrix = Matrix2.identity();
       this.updateMatrixInputs();  
     })
+
+    const toggleBtn = document.getElementById('toggle-added-vectors');
+    toggleBtn.addEventListener('click', () => {
+      this.showAddedVectors = !this.showAddedVectors;
+      toggleBtn.classList.toggle('active', !this.showAddedVectors);
+      this.app.view.updateVectorList();
+      this.app.view.update();
+    });
   }
 
   setSliderValue(value) {
@@ -104,6 +113,7 @@ class InputPanel {
   }
 
   _formatValue(value) {
+    console.log(value)
     return parseFloat(value.toFixed(2));
   }
 }

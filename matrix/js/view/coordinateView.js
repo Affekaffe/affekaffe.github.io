@@ -330,6 +330,7 @@ class CoordinateView {
 
 updateVectorList() {
   const list = document.getElementById("vector-list");
+  const toggleBtn = document.getElementById("toggle-added-vectors")
   if (!list) return;
   list.innerHTML = "";
 
@@ -342,19 +343,27 @@ updateVectorList() {
     }))
   ];
 
-  for (let i = 0; i < allVectors.length; i++) {
+  const vectorBoxCount = this.app.input.showAddedVectors ? allVectors.length : 2;
+
+  if (allVectors.length > 2) {
+      toggleBtn.classList.remove('hidden');
+    } else {
+      toggleBtn.classList.add('hidden');
+    }
+
+  for (let i = 0; i < vectorBoxCount; i++) {
     const { label, styled } = allVectors[i];
     const li = document.createElement("li");
 
     if (i < 2) {
-      // Basis vectors: just display values (not editable)
+      // Basis vectors
       li.innerHTML = `<span style="color:${styled.color}">${label}</span>: ${styled.vector2.x.toFixed(2)}, ${styled.vector2.y.toFixed(2)}`;
-    } else {
-      // Added vectors: create editable inputs
+    }  else if (this.app.input.showAddedVectors) {
+      // Extra vectors
       li.innerHTML = `
         <span style="color:${styled.color}">${label}</span>:
-        <input type="number" step="0.01" value="${styled.vector2.x.toFixed(2)}" style="width:60px" />
-        <input type="number" step="0.01" value="${styled.vector2.y.toFixed(2)}" style="width:60px" />
+        <input type="number" step="0.01" value="${styled.vector2.x.toFixed(2)}" style="width:40px" />
+        <input type="number" step="0.01" value="${styled.vector2.y.toFixed(2)}" style="width:40px" />
       `;
 
       const [xInput, yInput] = li.querySelectorAll("input");

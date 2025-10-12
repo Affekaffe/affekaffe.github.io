@@ -1,6 +1,7 @@
 import CoordinateView from "./coordinateView.js";
 
-const touchThreshold = 20
+const touchThreshold = 20;
+const snapThreshold = 0.05;
 
 class Interaction {
   constructor(app) {
@@ -55,19 +56,35 @@ class Interaction {
     if (!this.draggingVector) return;
     const mousePosCanvasCoords = this._getCanvasOffset(event, this.view.canvas);
     const mousePos = this.view.fromCanvasCoords(mousePosCanvasCoords.x, mousePosCanvasCoords.y);
+    
     if(this.draggingVector.isBasis){
-      this.draggingVector.vector2.x = mousePos.x;
-      this.draggingVector.vector2.y = mousePos.y;
-      this._updateMatrixEntries();
+      this._updateBasisVectors(mousePos);
     } else {
-      const inv = this.view.transformationMatrix.inv()
-      if (!inv.isInf()){
-        this.draggingVector.baseVector = inv.matmul(mousePos)
-      }
+      this._updateAddedVectors(mousePos);
     }
+
     this.input.updateMatrixInputs();
   }
 
+
+  _updateBasisVectors(mousePos) {
+    this.draggingVector.vector2 = this._getSnappedPos(mousePos);
+    this._updateMatrixEntries();
+  }
+
+  _updateAddedVectors(mousePos) {
+    const inv = this.view.transformationMatrix.inv();
+    if (!inv.isInf()) {
+      this.draggingVector.baseVector = inv.matmul(this._getSnappedPos(mousePos));
+    }
+  }
+
+  _getSnappedPos(pos){
+    const snappedPos = pos.clone();
+    if(Math.abs(Math.round(pos.x) - pos.x) < snapThreshold) snappedPos.x = Math.round(pos.x);
+    if(Math.abs(Math.round(pos.y) - pos.y) < snapThreshold) snappedPos.y = Math.round(pos.y);
+    return snappedPos;
+  }
 
   _updateMatrixEntries() {
     this.input.matrix.a = this.view.styledVectors[0].vector2.x;
