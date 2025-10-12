@@ -66,6 +66,11 @@ html, body {
   font-weight: bold;
 }
 
+#identity-button {
+  font-family: 'Merriweather', 'Times New Roman', serif;
+  font-size: 22px;  /* adjust to match your other buttons */
+}
+
 /* Slider */
 #slider-container {
   display: flex;
