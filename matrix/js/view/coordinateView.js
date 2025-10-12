@@ -35,6 +35,7 @@ class CoordinateView {
   initCanvas() {
     this.resizeCanvas();
     this.draw();
+    this.updateVectorList();
   }
 
   draw() {
@@ -45,7 +46,6 @@ class CoordinateView {
     this.drawGrid();
     this.drawVectors();
     this.updateVectorLabels();
-    this.updateVectorList();
   }
 
 

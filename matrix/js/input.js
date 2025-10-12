@@ -57,11 +57,13 @@ class InputPanel {
     const addVectorButton = document.getElementById("add-vector-button");
     addVectorButton.addEventListener("click", () => {
       view.addRandomVector()
+      view.updateVectorList();
     });
 
     const clearVectorButton = document.getElementById("clear-vector-button");
     clearVectorButton.addEventListener("click", () => {
       view.clearVectors()
+      view.updateVectorList();
     });
 
     const identityButton = document.getElementById("identity-button");
@@ -74,8 +76,8 @@ class InputPanel {
     toggleBtn.addEventListener('click', () => {
       this.showAddedVectors = !this.showAddedVectors;
       toggleBtn.classList.toggle('active', !this.showAddedVectors);
-      this.app.view.updateVectorList();
-      this.app.view.update();
+      view.updateVectorList();
+      view.update();
     });
   }
 
