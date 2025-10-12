@@ -1,14 +1,13 @@
 import CoordinateView from "./coordinateView.js";
 
-const touchThreshold = 0.2
+const touchThreshold = 20
 
 class Interaction {
-  constructor(view, input) {
-    this.view = view;
-    this.input = input;
+  constructor(app) {
+    this.view = app.view;
+    this.input = app.input;
     this.draggingVector = null;
     this.mouseStart = null;
-    this.setupEvents();
   }
 
   setupEvents() {
@@ -17,10 +16,23 @@ class Interaction {
     canvas.addEventListener('mousemove', (e) => this.handleDragMove(e));
     canvas.addEventListener('mouseup', (e) => this.handleDragEnd(e));
     canvas.addEventListener('wheel', (e) => this.handleWheel(e));
+    
+    //mobile
+    canvas.addEventListener('touchstart', (e) => this.handleDragStart(e.touches[0]));
+    canvas.addEventListener('touchmove', (e) => this.handleDragMove(e.touches[0]));
+    canvas.addEventListener('touchend', (e) => this.handleDragEnd(e.changedTouches[0]));
+
+    if (window.visualViewport) window.visualViewport.addEventListener('resize', () => this.handleResize());
+  }
+
+  handleResize(){
+    this.view.update()
   }
 
   handleDragStart(event) {
-    const mousePos = this.view.fromCanvasCoords(event.offsetX, event.offsetY);
+    console.log(event);
+    const mousePosCanvasCoords = this._getCanvasOffset(event, this.view.canvas);
+    const mousePos = this.view.fromCanvasCoords(mousePosCanvasCoords.x, mousePosCanvasCoords.y);
     this.draggingVector = null
 
     for (let i = 0; i < this.view.styledVectors.length; i++) {
@@ -28,8 +40,7 @@ class Interaction {
       const vector = styledV.vector2;
 
       const distanceToVector = mousePos.subtract(vector).length();
-
-      if (distanceToVector < touchThreshold) {
+      if (distanceToVector < touchThreshold / this.view.zoom) {
         this.draggingVector = styledV;
         break;
       }
@@ -43,16 +54,16 @@ class Interaction {
 
   handleDragMove(event) {
     if (!this.draggingVector) return;
-
-    const pos = this.view.fromCanvasCoords(event.offsetX, event.offsetY);
+    const mousePosCanvasCoords = this._getCanvasOffset(event, this.view.canvas);
+    const mousePos = this.view.fromCanvasCoords(mousePosCanvasCoords.x, mousePosCanvasCoords.y);
     if(this.draggingVector.isBasis){
-      this.draggingVector.vector2.x = pos.x;
-      this.draggingVector.vector2.y = pos.y;
+      this.draggingVector.vector2.x = mousePos.x;
+      this.draggingVector.vector2.y = mousePos.y;
       this._updateMatrixEntries();
     } else {
       const inv = this.view.transformationMatrix.inv()
       if (!inv.isInf()){
-        this.draggingVector.baseVector = inv.matmul(pos)
+        this.draggingVector.baseVector = inv.matmul(mousePos)
       }
     }
     this.input.updateMatrixInputs();
@@ -77,6 +88,14 @@ class Interaction {
     this.view.zoom *= (event.deltaY < 0) ? zoomFactor : 1 / zoomFactor;
     this.view.draw();
   }
+
+  _getCanvasOffset(e, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  return {
+    x: e.clientX - rect.left,
+    y: e.clientY - rect.top
+  };
+}
 }
 
 export default Interaction;

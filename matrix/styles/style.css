@@ -1,3 +1,10 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: #111;
+}
+
 /* =======================
    Global Reset
 ======================= */
@@ -8,6 +15,8 @@
   font-family: sans-serif;
 }
 
+
+
 /* =======================
    App Container
 ======================= */
@@ -16,18 +25,21 @@
   flex-direction: column;
   height: 100vh;
   width: 100vw;
+  touch-action: none;
 }
 
 /* =======================
    Controls
 ======================= */
 #controls {
+  position: relative;
   display: flex;
   justify-content: space-around;
   align-items: center;
   padding: 10px;
   background-color: #111111;
   border-bottom: 1px solid #222222;
+  z-index: 10;
 }
 
 /* Matrix Inputs */
@@ -156,10 +168,24 @@ canvas#view {
   user-select: none;
 }
 
-#controls {
-  position: relative; /* make this the reference for absolute positioning */
+#canvas-container {
+  position: relative;
+  flex: 1; /* keep existing behavior */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #111111;
+  overflow: hidden;
 }
 
+/* Make the labels overlay the canvas exactly */
+#vector-labels {
+  position: absolute;
+  inset: 0;             /* top:0; right:0; bottom:0; left:0; */
+  pointer-events: none; /* so clicks go to canvas */
+  width: 100%;
+  height: 100%;
+}
 
 #vector-coords {
   position: absolute;      /* overlay relative to #controls */
@@ -176,4 +202,69 @@ canvas#view {
   margin-top: 10px;
   margin-left: 10px;
   vertical-align: top;
+}
+#matrix-input-and-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+#matrix-input-container p {
+  display: inline-block;
+  margin-right: 10px;
+}
+
+@media (max-width: 775px) {
+  #controls {
+    display: flex;
+    flex-direction: column; /* keep slider below */
+    gap: 10px;
+  }
+
+  #matrix-input-and-buttons {
+    display: flex;
+    flex-direction: row;
+  }
+
+  /* Row for matrix + buttons */
+  #matrix-input-and-buttons {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  #matrix-input-container p {
+    font-size: 18px;
+    margin-right: 2px;
+  }
+
+  #object-control-container {
+    display: flex;
+    gap: 5px;
+  }
+
+  #add-vector-button, #clear-vector-button {
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+    padding: 0;
+  }
+
+  #slider-container {
+    margin-top: 10px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  #matrix-input input {
+    width: 50px;
+    font-size: 14px;
+  }
+
+  #matrix-input {
+    display: grid;
+    grid-template-columns: repeat(2, 50px);
+    grid-gap: 0px;
+  }
 }

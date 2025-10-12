@@ -1,6 +1,5 @@
 import StyledVector2 from "./styledVector2.js";
 import Vector2 from "../linalg/vector2.js";
-import Interaction from "./interaction.js";
 import Matrix2 from "../linalg/matrix2.js";
 
 class CoordinateView {
@@ -13,25 +12,24 @@ class CoordinateView {
     this.pan = { x: 0, y: 0 };
     this.styledVectors = [new StyledVector2(1, 0, "red", true), new StyledVector2(0, 1, "green", true)];
     this.transformationMatrix = Matrix2.identity()
-    this.interaction = new Interaction(this, app.input);
   }
 
+  update(matrix = this.transformationMatrix, t = 1) {
+    const matrix_t = Matrix2.identity().lerp(matrix, t)
 
-    // Interaction will handle dragging / zoom / pan
+    this.transformationMatrix = matrix_t;
 
-update(matrix = this.transformationMatrix, t = 1) {
-  const matrix_t = Matrix2.identity().lerp(matrix, t)
+    this.styledVectors[0].vector2 = matrix_t.matmul(new Vector2(1, 0));
+    this.styledVectors[1].vector2 = matrix_t.matmul(new Vector2(0, 1));
 
-  this.transformationMatrix = matrix_t;
-
-  this.styledVectors[0].vector2 = matrix_t.matmul(new Vector2(1, 0));
-  this.styledVectors[1].vector2 = matrix_t.matmul(new Vector2(0, 1));
-
-  for (let i = 2; i < this.styledVectors.length; i++) {
-    if(!this.styledVectors[i].baseVector) this.styledVectors[i].baseVector = this.styledVectors[i].vector2
-    this.styledVectors[i].vector2 = matrix_t.matmul(this.styledVectors[i].baseVector);
+    for (let i = 2; i < this.styledVectors.length; i++) {
+      if(!this.styledVectors[i].baseVector) this.styledVectors[i].baseVector = this.styledVectors[i].vector2
+      this.styledVectors[i].vector2 = matrix_t.matmul(this.styledVectors[i].baseVector);
+    }
+    this.setCorrectDeviceView();
+    this.resizeCanvas();
+    this.draw();
   }
-}
 
 
   initCanvas() {
@@ -64,7 +62,7 @@ update(matrix = this.transformationMatrix, t = 1) {
       const styled = this.styledVectors[i];
       const label = i === 0 ? "e₁" : i === 1 ? "e₂" : `v${i - 1}`;
 
-      const pos = this.toCanvasCoords(styled.vector2.subtract(new Vector2(0,1)));
+      const pos = this.toCanvasCoords(styled.vector2);
 
       const labelEl = document.createElement("div");
       labelEl.className = "vector-label";
@@ -271,8 +269,8 @@ update(matrix = this.transformationMatrix, t = 1) {
     // Convert logical coordinates → canvas pixels
   toCanvasCoords(v) {
     return {
-      x: this.canvas.width / 2 + (v.x + this.pan.x) * this.zoom,
-      y: this.canvas.height / 2 - (v.y + this.pan.y) * this.zoom
+      x: this.canvas.width / (2) + (v.x + this.pan.x) * this.zoom,
+      y: this.canvas.height / (2) - (v.y + this.pan.y) * this.zoom
     };
   }
 
@@ -284,19 +282,29 @@ update(matrix = this.transformationMatrix, t = 1) {
     );
   }
 
+  setCorrectDeviceView(){
+  const matrixLabel = document.querySelector('#matrix-input-container p');
+  const addVectorButton = document.querySelector('#add-vector-button');
+  const clearVectorButton = document.querySelector('#clear-vector-button');
+
+
+  if (window.innerWidth < this.app.mobileWidth) {
+    matrixLabel.textContent = 'M:';
+    addVectorButton.textContent = '+v';
+    clearVectorButton.textContent = "-";
+
+  } else {
+    matrixLabel.textContent = 'Matrix:';
+    addVectorButton.textContent = '+ Add Vector';
+    clearVectorButton.textContent = "- Clear";
+  }
+  }
+
   resizeCanvas() {
+    const rect = this.canvas.getBoundingClientRect();
 
-    const ratio = window.devicePixelRatio || 1;
-
-    // Set canvas size to match its displayed size in CSS
-    this.canvas.width = this.canvas.clientWidth * ratio;
-    this.canvas.height = this.canvas.clientHeight * ratio;
-
-    // Scale the context so drawing uses logical coordinates
-    this.ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-    // Optional: redraw after resizing
-    this.draw();
+    this.canvas.width = rect.width
+    this.canvas.height = rect.height
   }
 
   // Helper: random color generator
@@ -342,13 +350,23 @@ updateVectorList() {
 
       xInput.addEventListener("input", () => {
         styled.vector2.x = parseFloat(xInput.value);
-        styled.baseVector.x = styled.vector2.x;
+        const inv = this.matrix_t.inv()
+        if (!inv.isInf()) {
+          styled.baseVector.x = inv.matmul(styled.vector2.x);
+        } else {
+          styled.baseVector.x = parseFloat(1);
+        }
         this.draw();
       });
 
       yInput.addEventListener("input", () => {
         styled.vector2.y = parseFloat(yInput.value);
-        styled.baseVector.y = styled.vector2.y;
+        const inv = this.matrix_t.inv()
+        if (!inv.isInf()) {
+          styled.baseVector.y = inv.matmul(styled.vector2.y);
+        } else {
+          styled.baseVector.y = parseFloat(1);
+        }
         this.draw();
       });
     }

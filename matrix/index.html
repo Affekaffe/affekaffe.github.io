@@ -9,22 +9,24 @@
 <body>
   <div id="app">
     <div id="controls">
-      <div id="matrix-input-container">
-        <p>Matrix:</p>
-        <div id="matrix-input">
-        <input type="number" id="mat-a" value="1" step="any" inputmode="decimal">
-        <input type="number" id="mat-b" value="0" step="any" inputmode="decimal">
-        <input type="number" id="mat-c" value="0" step="any" inputmode="decimal">
-        <input type="number" id="mat-d" value="1" step="any" inputmode="decimal">
+      <div id="matrix-input-and-buttons">
+        <div id="matrix-input-container">
+          <p>Matrix:</p>
+          <div id="matrix-input">
+          <input type="number" id="mat-a" value="1" step="any" inputmode="decimal">
+          <input type="number" id="mat-b" value="0" step="any" inputmode="decimal">
+          <input type="number" id="mat-c" value="0" step="any" inputmode="decimal">
+          <input type="number" id="mat-d" value="1" step="any" inputmode="decimal">
+          </div>
+          <div>
+          <button id="identity-button" class="button-control reset-button" title="Set to the identity matrix">Ɪ</button>
+          </div>
         </div>
-        <div>
-        <button id="identity-button" class="button-control reset-button" title="Set to the identity matrix">Ɪ</button>
-        </div>
-      </div>
 
       <div id="object-control-container">
         <button id="add-vector-button" class="button-control add-vector-button">+ Add Vector</button>
         <button id="clear-vector-button" class="button-control clear-vector-button">- Clear</button>
+      </div>
       </div>
 
       <div id="slider-container">
@@ -40,7 +42,7 @@
     </div>
 
     <div id="canvas-container">
-      <canvas id="view" width="800" height="600"></canvas>
+      <canvas id="view"></canvas>
       <div id="vector-labels"></div>
     </div>
     
