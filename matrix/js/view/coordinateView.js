@@ -88,6 +88,7 @@ class CoordinateView {
     this.drawGrid();
     this.drawVectors();
     this.updateVectorLabels();
+    this.updateDeterminant();
   }
 
 
@@ -404,64 +405,113 @@ class CoordinateView {
       return baseV;
     }
 
-updateVectorList() {
-  const list = document.getElementById("vector-list");
-  const toggleBtn = document.getElementById("toggle-added-vectors")
-  if (!list) return;
-  list.innerHTML = "";
-
-  const allVectors = [
-    { label: "e1", styled: this.basisStyledVectors[0] },
-    { label: "e2", styled: this.basisStyledVectors[1] },
-    ...this.addedStyledVectors.map((v, i) => ({
-      label: "v" + (i + 1),
-      styled: v
-    }))
-  ];
-
-  const vectorBoxCount = this.input.showAddedVectors ? allVectors.length : 2;
-  const basisVectorCount = 2;
-  if (allVectors.length > basisVectorCount) {
-      toggleBtn.classList.remove('hidden');
-    } else {
-      toggleBtn.classList.add('hidden');
-    }
-
-  for (let i = 0; i < vectorBoxCount; i++) {
-    const { label, styled } = allVectors[i];
-    const li = document.createElement("li");
-
-    if (i < 2) {
-      // Basis vectors
-      li.innerHTML = `<span style="color:${styled.color}">${label}</span>: ${styled.vector2.x.toFixed(2)}, ${styled.vector2.y.toFixed(2)}`;
-    }  else if (this.input.showAddedVectors) {
-      // Extra vectors
-      li.innerHTML = `
-        <span style="color:${styled.color}">${label}</span>:
-        <input type="number" step="0.01" value="${styled.vector2.x.toFixed(2)}" style="width:50px" />
-        <input type="number" step="0.01" value="${styled.vector2.y.toFixed(2)}" style="width:50px" />
-      `;
-
-      const [xInput, yInput] = li.querySelectorAll("input");
-
-      xInput.addEventListener("change", () => {
-        const inputVector = new Vector2(parseFloat(xInput.value), parseFloat(yInput.value));
-        styled.baseVector = this._calcBaseVectorFrom(inputVector);
-        this.update();
-      });
-
-      yInput.addEventListener("change", () => {
-        const inputVector = new Vector2(parseFloat(xInput.value), parseFloat(yInput.value));
-        styled.baseVector = this._calcBaseVectorFrom(inputVector);
-        this.update();
-      });
-    }
-
-    list.appendChild(li);
+  updateDeterminant() {
+    if (this.input.showDeterminant) this.drawUnitSquare(true);
   }
-}
 
+  updateVectorList() {
+    const list = document.getElementById("vector-list");
+    const toggleBtn = document.getElementById("toggle-added-vectors")
+    if (!list) return;
+    list.innerHTML = "";
 
+    const allVectors = [
+      { label: "e1", styled: this.basisStyledVectors[0] },
+      { label: "e2", styled: this.basisStyledVectors[1] },
+      ...this.addedStyledVectors.map((v, i) => ({
+        label: "v" + (i + 1),
+        styled: v
+      }))
+    ];
+
+    const vectorBoxCount = this.input.showAddedVectors ? allVectors.length : 2;
+    const basisVectorCount = 2;
+    if (allVectors.length > basisVectorCount) {
+        toggleBtn.classList.remove('hidden');
+      } else {
+        toggleBtn.classList.add('hidden');
+      }
+
+    for (let i = 0; i < vectorBoxCount; i++) {
+      const { label, styled } = allVectors[i];
+      const li = document.createElement("li");
+
+      if (i < 2) {
+        // Basis vectors
+        li.innerHTML = `<span style="color:${styled.color}">${label}</span>: ${styled.vector2.x.toFixed(2)}, ${styled.vector2.y.toFixed(2)}`;
+      }  else if (this.input.showAddedVectors) {
+        // Extra vectors
+        li.innerHTML = `
+          <span style="color:${styled.color}">${label}</span>:
+          <input type="number" step="0.01" value="${styled.vector2.x.toFixed(2)}" style="width:50px" />
+          <input type="number" step="0.01" value="${styled.vector2.y.toFixed(2)}" style="width:50px" />
+        `;
+
+        const [xInput, yInput] = li.querySelectorAll("input");
+
+        xInput.addEventListener("change", () => {
+          const inputVector = new Vector2(parseFloat(xInput.value), parseFloat(yInput.value));
+          styled.baseVector = this._calcBaseVectorFrom(inputVector);
+          this.update();
+        });
+
+        yInput.addEventListener("change", () => {
+          const inputVector = new Vector2(parseFloat(xInput.value), parseFloat(yInput.value));
+          styled.baseVector = this._calcBaseVectorFrom(inputVector);
+          this.update();
+        });
+      }
+
+      list.appendChild(li);
+    }
+  }
+
+  drawUnitSquare(highlight = false) {
+    const ctx = this.ctx;
+
+    // Transformed basis vectors
+    const e1 = this.transformationMatrix.matmul(new Vector2(1, 0));
+    const e2 = this.transformationMatrix.matmul(new Vector2(0, 1));
+
+    // Compute corners of parallelogram
+    const origin = new Vector2(0, 0);
+    const p1 = this.toCanvasCoords(origin);
+    const p2 = this.toCanvasCoords(e1);
+    const p3 = this.toCanvasCoords(e1.add(e2));
+    const p4 = this.toCanvasCoords(e2);
+
+    ctx.save();
+
+    // Fill and border style
+    ctx.beginPath();
+    ctx.moveTo(p1.x, p1.y);
+    ctx.lineTo(p2.x, p2.y);
+    ctx.lineTo(p3.x, p3.y);
+    ctx.lineTo(p4.x, p4.y);
+    ctx.closePath();
+
+    if (highlight) {
+      ctx.fillStyle = "rgba(0, 200, 255, 0.2)";
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = "#00ffff";
+    } else {
+      ctx.strokeStyle = "#555";
+      ctx.lineWidth = 1;
+    }
+
+    ctx.stroke();
+
+    // Optional: display determinant value in the center
+    const det = this.transformationMatrix.a * this.transformationMatrix.d -
+                this.transformationMatrix.b * this.transformationMatrix.c;
+    const center = this.toCanvasCoords(e1.add(e2).scale(0.5));
+    ctx.fillStyle = "#00ffff";
+    ctx.font = "14px monospace";
+    ctx.fillText(`${Math.abs(det).toFixed(2)}`, center.x - 16, center.y);
+
+    ctx.restore();
+  }
 
 }
 

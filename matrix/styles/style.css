@@ -101,6 +101,39 @@ canvas#view {
   background-color: #111111;
   border: 1px solid #222222;
 }
+
+#settings-wrapper {
+  position: absolute;
+  top: 10px;        /* distance from top of canvas/container */
+  right: 10px;      /* pinned to right */
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  z-index: 15;      /* above canvas and vector labels */
+}
+
+#settings-panel {
+  margin-top: 5px;        /* space below button */
+  background: #222;
+  border: 1px solid #555;
+  padding: 8px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  display: none;           /* hidden by default */
+}
+
+#settings-panel.show {
+  display: block;
+}
+
+#settings-panel label {
+  color: #ccc;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
 #slider-container {
   display: flex;
   align-items: center;
@@ -123,10 +156,29 @@ canvas#view {
   padding: 6px 12px;
   cursor: pointer;
   transition: background 0.1s;
+  align-items: center;
+  justify-content: center;
 }
 
 .button-control:hover {
   background-color: #006600; 
+}
+
+.settings-button {
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #cccccc;
+  background: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.settings-button:hover {
+  background-color: #555;
 }
 
 .reset-button {
@@ -293,7 +345,6 @@ canvas#view {
   }
 
   #slider-container {
-    margin-top: 10px;
     display: flex;
     justify-content: center;
     gap: 10px;

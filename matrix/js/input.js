@@ -24,6 +24,9 @@ class InputPanel {
 
     /** @type {() => void | null} */
     this.onChange = null; // callback to notify App
+
+    /** @type {boolean} */
+    this.showDeterminant = false;
   }
 
   initUI(){
@@ -100,6 +103,20 @@ class InputPanel {
       toggleBtn.classList.toggle('active', !this.showAddedVectors);
       view.updateVectorList();
       view.update();
+    });
+
+    
+    const settingsButton = document.getElementById("settings-button");
+    const settingsPanel = document.getElementById("settings-panel");
+
+      settingsButton.addEventListener("click", () => {
+        settingsPanel.classList.toggle("show");
+      }); 
+    
+    const showDeterminantCheck = document.getElementById("show-determinant");
+    showDeterminantCheck.addEventListener("change", (e) => {
+      this.showDeterminant = e.target.checked;
+      if (this.onChange) this.onChange();
     });
   }
 
