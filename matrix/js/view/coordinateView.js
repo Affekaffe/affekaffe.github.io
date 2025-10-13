@@ -468,7 +468,7 @@ class CoordinateView {
 
   drawUnitSquare(highlight = false) {
     const ctx = this.ctx;
-
+    const det = this.transformationMatrix.det();
     // Transformed basis vectors
     const e1 = this.transformationMatrix.matmul(new Vector2(1, 0));
     const e2 = this.transformationMatrix.matmul(new Vector2(0, 1));
@@ -491,10 +491,16 @@ class CoordinateView {
     ctx.closePath();
 
     if (highlight) {
-      ctx.fillStyle = "rgba(0, 200, 255, 0.2)";
+      if(det > 0) {
+         ctx.fillStyle = "#0044ff22";
+        ctx.strokeStyle = "#00ffff";
+      } else {
+        ctx.fillStyle = "#66000022"
+        ctx.strokeStyle = "#ee0000";
+      }
       ctx.fill();
       ctx.lineWidth = 2;
-      ctx.strokeStyle = "#00ffff";
+
     } else {
       ctx.strokeStyle = "#555";
       ctx.lineWidth = 1;
@@ -503,16 +509,19 @@ class CoordinateView {
     ctx.stroke();
 
     // Optional: display determinant value in the center
-    const det = this.transformationMatrix.a * this.transformationMatrix.d -
-                this.transformationMatrix.b * this.transformationMatrix.c;
-    const center = this.toCanvasCoords(e1.add(e2).scale(0.5));
-    ctx.fillStyle = "#00ffff";
-    ctx.font = "14px monospace";
-    ctx.fillText(`${Math.abs(det).toFixed(2)}`, center.x - 16, center.y);
+    this._printDeterminant(ctx, e1, e2);
 
     ctx.restore();
   }
 
+
+  _printDeterminant(ctx, e1, e2) {
+    const det = this.transformationMatrix.det();
+    const center = this.toCanvasCoords(e1.add(e2).scale(0.5));
+    ctx.fillStyle = "#00ffff";
+    ctx.font = "14px monospace";
+    ctx.fillText(`${det.toFixed(2)}`, center.x - 16, center.y);
+  }
 }
 
 export default CoordinateView

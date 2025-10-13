@@ -139,7 +139,6 @@ class Interaction {
   handleDragEnd(event) {
     this.handleDragMove(event);
     if (!this.draggingVector) return;
-    if (this.draggingVector.isBasis) this.view.startAnimation(10, 1, this.actualSliderValue);
     
     this.mouseStart = null; 
     this.draggingVector.selected = false;
