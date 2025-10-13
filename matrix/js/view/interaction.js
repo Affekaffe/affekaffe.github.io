@@ -71,6 +71,7 @@ class Interaction {
     if (this.draggingVector.isBasis){
       this.actualSliderValue = this.input.getSliderValue();
       this.view.startAnimation(10, this.actualSliderValue, 1)
+      
     }
 
     this.handleDragMove(event);
