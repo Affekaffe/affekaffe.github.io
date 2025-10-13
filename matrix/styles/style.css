@@ -234,7 +234,7 @@ canvas#view {
   cursor: pointer;
   padding: 0;
   margin-left: 5px;     
-  display: inline-flex;
+  display: none;
   align-items: center;
   justify-content: center;
 }

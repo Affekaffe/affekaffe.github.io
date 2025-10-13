@@ -9,6 +9,7 @@ class Interaction {
     this.input = app.input;
     this.draggingVector = null;
     this.mouseStart = null;
+    this.actualSliderValue = this.input.getSliderValue();
   }
 
   setupEvents() {
@@ -47,12 +48,17 @@ class Interaction {
     }
 
     if (this.draggingVector !== null) {
+      this.draggingVector.selected = true;
       this.mouseStart = mousePos;
-      if (this.draggingVector.isBasis) this.input.setSliderValue(1);
+      this.actualSliderValue = this.input.getSliderValue();
+      this.view.startAnimation(10, this.actualSliderValue, 1)
     }
+
+    this.handleDragMove(event);
   }
 
   handleDragMove(event) {
+    if (this.view.animating) return;
     if (!this.draggingVector) return;
     const mousePosCanvasCoords = this._getCanvasOffset(event, this.view.canvas);
     const mousePos = this.view.fromCanvasCoords(mousePosCanvasCoords.x, mousePosCanvasCoords.y);
@@ -94,8 +100,11 @@ class Interaction {
   }
 
   handleDragEnd(event) {
+    this.handleDragMove(event);
+    this.draggingVector.selected = false;
     this.draggingVector = null;
     this.mouseStart = null;
+    this.view.startAnimation(10, 1, this.actualSliderValue)
   }
 
   handleWheel(event) {

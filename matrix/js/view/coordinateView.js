@@ -5,6 +5,7 @@ import Matrix2 from "../linalg/matrix2.js";
 class CoordinateView {
   constructor(app) {
     this.app = app;
+    this.input = this.app.input;
     this.canvas = document.getElementById("view");
     this.ctx = this.canvas.getContext("2d");
     this.labelsContainer = document.getElementById("vector-labels")
@@ -12,6 +13,7 @@ class CoordinateView {
     this.pan = { x: 0, y: 0 };
     this.styledVectors = [new StyledVector2(1, 0, "red", true), new StyledVector2(0, 1, "green", true)];
     this.transformationMatrix = Matrix2.identity()
+    this.animating = false;
   }
 
   update(matrix = this.transformationMatrix, t = 1) {
@@ -19,10 +21,12 @@ class CoordinateView {
 
     this.transformationMatrix = matrix_t;
 
-    this.styledVectors[0].vector2 = matrix_t.matmul(new Vector2(1, 0));
-    this.styledVectors[1].vector2 = matrix_t.matmul(new Vector2(0, 1));
+    
+    if (!this.styledVectors[0].selected) this.styledVectors[0].vector2 = matrix_t.matmul(new Vector2(1, 0));
+    if (!this.styledVectors[1].selected) this.styledVectors[1].vector2 = matrix_t.matmul(new Vector2(0, 1));
 
     for (let i = 2; i < this.styledVectors.length; i++) {
+      if (this.styledVectors[i].selected) continue;
       if(!this.styledVectors[i].baseVector) this.styledVectors[i].baseVector = this.styledVectors[i].vector2
       this.styledVectors[i].vector2 = matrix_t.matmul(this.styledVectors[i].baseVector);
     }
@@ -217,22 +221,38 @@ class CoordinateView {
     ctx.fill();
   }
 
-  startAnimation(duration = 2000) {
-    const input = this.app.input;
+  startAnimation(speed = 0.5, start = 0, end = 1) {
+
+
+    const duration = Math.abs(end - start) * 1000 / speed
+    this.animating = true
+
+    const sliderNearEnd = Math.abs(start - end) < 0.03;
+    if (sliderNearEnd) {
+      this._onAnimationEnd(end);
+      return;
+    }
+
     const startTime = performance.now();
 
     const animate = (time) => {
-      const t = (time - startTime) / duration;
-      if (t >= 1) {
-        input.setSliderValue(1); // ensure it ends at 1
-        return; // stop
+      const progress = (time - startTime) / duration;
+      if (progress >= 1) {
+        this._onAnimationEnd(end);
+        return;
       }
 
-      input.setSliderValue(t); // update slider and trigger redraw
+      const value = start + (end - start) * Math.max(0, progress);
+      this.input.setSliderValue(value); // update slider and trigger redraw
       requestAnimationFrame(animate);
     };
 
     requestAnimationFrame(animate);
+  }
+
+  _onAnimationEnd(endTime){
+      this.input.setSliderValue(endTime);
+      this.animating = false;
   }
 
   addRandomVector(){

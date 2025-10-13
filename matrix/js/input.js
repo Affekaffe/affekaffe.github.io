@@ -52,6 +52,7 @@ class InputPanel {
     const resetButton = document.getElementById("reset-button");
     resetButton.addEventListener("click", () => {
       this.setSliderValue(0);
+      
     });
 
     const addVectorButton = document.getElementById("add-vector-button");
@@ -75,6 +76,7 @@ class InputPanel {
     const toggleBtn = document.getElementById('toggle-added-vectors');
     toggleBtn.addEventListener('click', () => {
       this.showAddedVectors = !this.showAddedVectors;
+      toggleBtn.style.display = 'inline-flex';
       toggleBtn.classList.toggle('active', !this.showAddedVectors);
       view.updateVectorList();
       view.update();
@@ -115,7 +117,6 @@ class InputPanel {
   }
 
   _formatValue(value) {
-    console.log(value)
     return parseFloat(value.toFixed(2));
   }
 }

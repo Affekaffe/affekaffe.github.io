@@ -5,7 +5,8 @@ class StyledVector2{
     this.vector2 = new Vector2(x, y)
     this.color = color
     this.isBasis = isBasis
-    this.baseVector = null
+    this.baseVector = this.vector2.clone()
+    this.selected = false;
   }
 
   add(other){
