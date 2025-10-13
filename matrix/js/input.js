@@ -1,26 +1,46 @@
 import Matrix2 from "./linalg/matrix2.js";
 
+/**
+ * @typedef {import('./view/coordinateView.js').default} CoordinateView
+ * @typedef {import('./app.js').default} App
+ */
+
 class InputPanel {
+  /**
+   * @param {App} app
+   */
   constructor(app) {
+    /** @type {App} */
     this.app = app;
-    this.matrix = Matrix2.identity()
+
+    /** @type {Matrix2} */
+    this.matrix = Matrix2.identity();
+
+    /** @type {number} */
     this.sliderValue = 1;
-    this.showAddedVectors = true; 
+
+    /** @type {boolean} */
+    this.showAddedVectors = true;
+
+    /** @type {() => void | null} */
     this.onChange = null; // callback to notify App
   }
 
   initUI(){
+    /**@type {CoordinateView} */
+    this.view = this.app.view;
+
     const ids = ['mat-a', 'mat-b', 'mat-c', 'mat-d'];
     const keys = ['a', 'b', 'c', 'd']; // Matrix2 properties
     ids.forEach((id, i) => {
     document.getElementById(id).value = this.matrix[keys[i]];
-  });
     
+    }); 
     this.bindUI();
   } 
 
   bindUI() {
-  const view = this.app.view;  
+  const view = this.view;  
 
   const fields = ['mat-a', 'mat-b', 'mat-c', 'mat-d'];
   fields.forEach(id => {
@@ -74,6 +94,7 @@ class InputPanel {
     })
 
     const toggleBtn = document.getElementById('toggle-added-vectors');
+    toggleBtn.style.display = "inline-flex";
     toggleBtn.addEventListener('click', () => {
       this.showAddedVectors = !this.showAddedVectors;
       toggleBtn.classList.toggle('active', !this.showAddedVectors);

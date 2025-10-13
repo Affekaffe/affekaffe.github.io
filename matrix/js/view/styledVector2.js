@@ -1,12 +1,13 @@
 import Vector2 from "../linalg/vector2.js"
 
 class StyledVector2{
-  constructor(x, y, color="red", isBasis = false){
+  constructor(x, y, color="red", isBasis = false, label = ""){
     this.vector2 = new Vector2(x, y)
     this.color = color
     this.isBasis = isBasis
     this.baseVector = this.vector2.clone()
     this.selected = false;
+    this.label = label;
   }
 
   add(other){

@@ -1,15 +1,40 @@
+import Vector2 from "../linalg/vector2.js";
 import CoordinateView from "./coordinateView.js";
 
 const touchThreshold = 20;
 const snapThreshold = 5;
 
+/**
+ * @typedef {import('./coordinateView.js').default} CoordinateView
+ * @typedef {import('../input.js').default} InputPanel
+ * @typedef {import('../app.js').default} App
+ */
+
+
 class Interaction {
+  /**
+   * @param {App} app
+   */
   constructor(app) {
-    this.view = app.view;
-    this.input = app.input;
+    /** @type {App} */
+    this.app = app;
+
+    /** @type {Vector2 | null} */
     this.draggingVector = null;
+
+    /** @type {Vector2 | null} */
     this.mouseStart = null;
-    this.actualSliderValue = this.input.getSliderValue();
+
+    /** @type {number} */
+    this.actualSliderValue = 0;
+  }
+
+  initInteraction(){
+    /** @type {CoordinateView} */
+    this.view = this.app.view;
+    /** @type {InputPanel} */
+    this.input = this.app.input;
+    this.setupEvents();
   }
 
   setupEvents() {
@@ -36,25 +61,34 @@ class Interaction {
     const mousePos = this.view.fromCanvasCoords(mousePosCanvasCoords.x, mousePosCanvasCoords.y);
     this.draggingVector = null
 
-    for (let i = 0; i < this.view.styledVectors.length; i++) {
-      const styledV = this.view.styledVectors[i];
-      const vector = styledV.vector2;
+    this._setDraggingVectorFromPos(mousePos);
 
-      const distanceToVector = mousePos.subtract(vector).length();
-      if (distanceToVector < this.getCorrectedTouchThreshold()) {
-        this.draggingVector = styledV;
-        break;
-      }
-    }
-
-    if (this.draggingVector !== null) {
-      this.draggingVector.selected = true;
-      this.mouseStart = mousePos;
+    if (!this.draggingVector) return; 
+    
+    this.draggingVector.selected = true;
+    this.mouseStart = mousePos;
+    
+    if (this.draggingVector.isBasis){
       this.actualSliderValue = this.input.getSliderValue();
       this.view.startAnimation(10, this.actualSliderValue, 1)
     }
 
     this.handleDragMove(event);
+  }
+
+  _setDraggingVectorFromPos(mousePos) {
+    this.draggingVector = this._getVectorNearPosFromList(mousePos, this.view.basisStyledVectors); //Prioritize Basis Vectors
+    if (!this.draggingVector) this.draggingVector = this._getVectorNearPosFromList(mousePos, this.view.addedStyledVectors);
+  }
+
+  _getVectorNearPosFromList(mousePos, vectorList) {
+    for (let i = 0; i < vectorList.length; i++) {
+
+      const styledV = vectorList[i];
+      const distanceToVector = mousePos.subtract(styledV.vector2).length();
+
+      if (distanceToVector < this.getCorrectedTouchThreshold()) return styledV;
+    }
   }
 
   handleDragMove(event) {
@@ -69,6 +103,7 @@ class Interaction {
       this._updateAddedVectors(mousePos);
     }
 
+    this.view.updateVectorList();
     this.input.updateMatrixInputs();
   }
 
@@ -80,6 +115,7 @@ class Interaction {
 
   _updateAddedVectors(mousePos) {
     const inv = this.view.transformationMatrix.inv();
+    console.log(inv)
     if (!inv.isInf()) {
       this.draggingVector.baseVector = inv.matmul(this._getSnappedPos(mousePos));
     }
@@ -93,18 +129,20 @@ class Interaction {
   }
 
   _updateMatrixEntries() {
-    this.input.matrix.a = this.view.styledVectors[0].vector2.x;
-    this.input.matrix.c = this.view.styledVectors[0].vector2.y;
-    this.input.matrix.b = this.view.styledVectors[1].vector2.x;
-    this.input.matrix.d = this.view.styledVectors[1].vector2.y;
+    this.input.matrix.a = this.view.basisStyledVectors[0].vector2.x;
+    this.input.matrix.c = this.view.basisStyledVectors[0].vector2.y;
+    this.input.matrix.b = this.view.basisStyledVectors[1].vector2.x;
+    this.input.matrix.d = this.view.basisStyledVectors[1].vector2.y;
   }
 
   handleDragEnd(event) {
     this.handleDragMove(event);
+    if (!this.draggingVector) return;
+    if (this.draggingVector.isBasis) this.view.startAnimation(10, 1, this.actualSliderValue);
+    
+    this.mouseStart = null; 
     this.draggingVector.selected = false;
     this.draggingVector = null;
-    this.mouseStart = null;
-    this.view.startAnimation(10, 1, this.actualSliderValue)
   }
 
   handleWheel(event) {

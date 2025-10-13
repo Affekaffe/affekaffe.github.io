@@ -2,45 +2,82 @@ import StyledVector2 from "./styledVector2.js";
 import Vector2 from "../linalg/vector2.js";
 import Matrix2 from "../linalg/matrix2.js";
 
+/**
+ * @typedef {import('../input.js').default} InputPanel
+ * @typedef {import('../app.js').default} App
+ */
+
+/**
+ * @typedef {Object} App
+ * @property {InputPanel} input
+ * @property {number} mobileWidth
+ */
+
 class CoordinateView {
+  /**
+   * @param {App} app
+   */
   constructor(app) {
+    /** @type {App} */
     this.app = app;
-    this.input = this.app.input;
+
+    /** @type {HTMLCanvasElement} */
     this.canvas = document.getElementById("view");
+
+    /** @type {CanvasRenderingContext2D} */
     this.ctx = this.canvas.getContext("2d");
-    this.labelsContainer = document.getElementById("vector-labels")
+
+    /** @type {HTMLElement} */
+    this.labelsContainer = document.getElementById("vector-labels");
+
+    /** @type {number} */
     this.zoom = 100;
+
+    /** @type {{x:number, y:number}} */
     this.pan = { x: 0, y: 0 };
-    this.styledVectors = [new StyledVector2(1, 0, "red", true), new StyledVector2(0, 1, "green", true)];
-    this.transformationMatrix = Matrix2.identity()
+
+    /** @type {StyledVector2[]} */
+    this.addedStyledVectors = []
+    
+    /** @type {StyledVector2[]} */
+    this.basisStyledVectors = [
+      new StyledVector2(1, 0, "red", true, "e₁"),
+      new StyledVector2(0, 1, "green", true, "e₂")
+    ];
+
+    /** @type {Matrix2} */
+    this.transformationMatrix = Matrix2.identity();
+
+    /** @type {boolean} */
     this.animating = false;
+  }
+
+  initCanvas() {
+    /** @type {InputController} */
+    this.input = this.app.input;
+    this.resizeCanvas();
+    this.draw();
+    this.updateVectorList();
   }
 
   update(matrix = this.transformationMatrix, t = 1) {
     const matrix_t = Matrix2.identity().lerp(matrix, t)
 
     this.transformationMatrix = matrix_t;
-
+    let basisX = this.basisStyledVectors[0];
+    let basisY = this.basisStyledVectors[1];
     
-    if (!this.styledVectors[0].selected) this.styledVectors[0].vector2 = matrix_t.matmul(new Vector2(1, 0));
-    if (!this.styledVectors[1].selected) this.styledVectors[1].vector2 = matrix_t.matmul(new Vector2(0, 1));
+    if (!basisX.selected) basisX.vector2 = matrix_t.matmul(new Vector2(1, 0));
+    if (!basisY.selected) basisY.vector2 = matrix_t.matmul(new Vector2(0, 1));
 
-    for (let i = 2; i < this.styledVectors.length; i++) {
-      if (this.styledVectors[i].selected) continue;
-      if(!this.styledVectors[i].baseVector) this.styledVectors[i].baseVector = this.styledVectors[i].vector2
-      this.styledVectors[i].vector2 = matrix_t.matmul(this.styledVectors[i].baseVector);
+    for (let i = 0; i < this.addedStyledVectors.length; i++) {
+      if(!this.addedStyledVectors[i].baseVector) this.addedStyledVectors[i].baseVector = this.addedStyledVectors[i].vector2
+      this.addedStyledVectors[i].vector2 = matrix_t.matmul(this.addedStyledVectors[i].baseVector);
     }
     
     this.setCorrectDeviceView();
     this.resizeCanvas();
     this.draw();
-  }
-
-
-  initCanvas() {
-    this.resizeCanvas();
-    this.draw();
-    this.updateVectorList();
   }
 
   draw() {
@@ -63,20 +100,26 @@ class CoordinateView {
     // Clear previous labels
     this.labelsContainer.innerHTML = "";
 
-    for (let i = 0; i < this.styledVectors.length; i++) {
-      const styled = this.styledVectors[i];
-      const label = i === 0 ? "e₁" : i === 1 ? "e₂" : `v${i - 1}`;
-
-      const pos = this.toCanvasCoords(styled.vector2);
-
-      const labelEl = document.createElement("div");
-      labelEl.className = "vector-label";
-      labelEl.textContent = label;
-      labelEl.style.left = `${pos.x + 10}px`;
-      labelEl.style.top = `${pos.y - 5}px`;
-      labelEl.style.color = styled.color;
-      this.labelsContainer.appendChild(labelEl);
+    for (let i = 0; i < this.basisStyledVectors.length; i++) {
+      const basisStyledVector = this.basisStyledVectors[i];
+      this._addVectorLabel(basisStyledVector);
     }
+
+    for (let i = 0; i < this.addedStyledVectors.length; i++) {
+      const styledVector = this.addedStyledVectors[i];
+      this._addVectorLabel(styledVector);
+    }
+  }
+
+  _addVectorLabel(styledVector, label) {
+    const pos = this.toCanvasCoords(styledVector.vector2);
+    const labelElement = document.createElement("div");
+    labelElement.className = "vector-label";
+    labelElement.textContent = styledVector.label;
+    labelElement.style.left = `${pos.x + 10}px`;
+    labelElement.style.top = `${pos.y - 5}px`;
+    labelElement.style.color = styledVector.color;
+    this.labelsContainer.appendChild(labelElement);
   }
 
   _drawLine(x1, y1, x2, y2, color = "#ddd", width = 1) {
@@ -187,19 +230,32 @@ class CoordinateView {
 
     const lineWidth = 3;
 
-    for (let i = 0; i < this.styledVectors.length; i++) {
-      const vec = this.styledVectors[i].vector2;
-      const color = this.styledVectors[i].color;
-
-      const origin = this.toCanvasCoords(new Vector2(0, 0));
-      const end = this.toCanvasCoords(vec);
-      
-      this._drawLine(origin.x, origin.y, end.x, end.y, color, lineWidth)
-
-      this._drawArrowhead(ctx, origin, end, color);
-    }
+    this._drawAllBasisVectors(ctx, lineWidth);
+    this._drawAllAddedVectors(ctx, lineWidth);
 
     ctx.restore();
+  }
+
+  _drawAllAddedVectors(ctx, lineWidth) {
+    for (let i = 0; i < this.addedStyledVectors.length; i++) {
+      const vec = this.addedStyledVectors[i];
+      this._drawArrow(ctx, vec.vector2, vec.color, lineWidth);
+    }
+  }
+
+  _drawAllBasisVectors(ctx, lineWidth) {
+    for (let i = 0; i < this.basisStyledVectors.length; i++) {
+      const vec = this.basisStyledVectors[i];
+      this._drawArrow(ctx, vec.vector2, vec.color, lineWidth);
+    }
+  }
+
+  _drawArrow(ctx, vec, color, lineWidth) {
+    const origin = this.toCanvasCoords(new Vector2(0, 0));
+    const end = this.toCanvasCoords(vec);
+
+    this._drawLine(origin.x, origin.y, end.x, end.y, color, lineWidth);
+    this._drawArrowhead(ctx, origin, end, color);
   }
 
   _drawArrowhead(ctx, start, end, color) {
@@ -223,8 +279,6 @@ class CoordinateView {
   }
 
   startAnimation(speed = 0.5, start = 0, end = 1) {
-
-
     const duration = Math.abs(end - start) * 1000 / speed
     this.animating = true
 
@@ -261,7 +315,8 @@ class CoordinateView {
       const randX = Math.random() - 0.5
       const randY = Math.random() - 0.5
 
-      const newVec = new StyledVector2(randX, randY, this._getRandomColor());
+      const vectorNr = this.addedStyledVectors.length + 1;
+      const newVec = new StyledVector2(randX, randY, this._getRandomColor(), false, `v${vectorNr}`);
       newVec.vector2 = newVec.vector2.normalize().scale(Math.random() * 2 + 1);
 
       const inv = this.transformationMatrix.inv();
@@ -275,7 +330,7 @@ class CoordinateView {
       }
 
       // Add it to the view
-      this.styledVectors.push(newVec);
+      this.addedStyledVectors.push(newVec);
 
       // Redraw canvas
       this.update();
@@ -283,7 +338,7 @@ class CoordinateView {
   }
 
   clearVectors(){
-    this.styledVectors = [this.styledVectors[0], this.styledVectors[1]];
+    this.addedStyledVectors = [];
     this.draw();
   }
 
@@ -356,17 +411,17 @@ updateVectorList() {
   list.innerHTML = "";
 
   const allVectors = [
-    { label: "e1", styled: this.styledVectors[0] },
-    { label: "e2", styled: this.styledVectors[1] },
-    ...this.styledVectors.slice(2).map((v, i) => ({
+    { label: "e1", styled: this.basisStyledVectors[0] },
+    { label: "e2", styled: this.basisStyledVectors[1] },
+    ...this.addedStyledVectors.map((v, i) => ({
       label: "v" + (i + 1),
       styled: v
     }))
   ];
 
-  const vectorBoxCount = this.app.input.showAddedVectors ? allVectors.length : 2;
-
-  if (allVectors.length > 2) {
+  const vectorBoxCount = this.input.showAddedVectors ? allVectors.length : 2;
+  const basisVectorCount = 2;
+  if (allVectors.length > basisVectorCount) {
       toggleBtn.classList.remove('hidden');
     } else {
       toggleBtn.classList.add('hidden');
@@ -379,7 +434,7 @@ updateVectorList() {
     if (i < 2) {
       // Basis vectors
       li.innerHTML = `<span style="color:${styled.color}">${label}</span>: ${styled.vector2.x.toFixed(2)}, ${styled.vector2.y.toFixed(2)}`;
-    }  else if (this.app.input.showAddedVectors) {
+    }  else if (this.input.showAddedVectors) {
       // Extra vectors
       li.innerHTML = `
         <span style="color:${styled.color}">${label}</span>:

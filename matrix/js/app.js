@@ -2,22 +2,34 @@ import InputPanel from "./input.js";
 import CoordinateView from "./view/coordinateView.js"
 import Interaction from "./view/interaction.js";
 
-
+/**
+ * @typedef {Object} App
+ * @property {number} mobileWidth
+ * @property {InputPanel} input
+ * @property {CoordinateView} view
+ * @property {Interaction} interaction
+ */
 class App {
   constructor() {
+    /** @type {number} */
     this.mobileWidth = 775;
 
-    this.input = new InputPanel(this); // handles matrix inputs & slider
-    this.view = new CoordinateView(this); // handles canvas rendering
+    /** @type {InputPanel} */
+    this.input = new InputPanel(this);
+
+    /** @type {CoordinateView} */
+    this.view = new CoordinateView(this);
+
+    /** @type {Interaction} */
     this.interaction = new Interaction(this);
+
     this.setup();
   }
 
   setup() {
-
     this.input.initUI();
     this.view.initCanvas();
-    this.interaction.setupEvents();
+    this.interaction.initInteraction();
     this.update();
 
     this.input.onChange = () => {
