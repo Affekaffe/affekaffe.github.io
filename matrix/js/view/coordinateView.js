@@ -112,7 +112,7 @@ class CoordinateView {
     }
   }
 
-  _addVectorLabel(styledVector, label) {
+  _addVectorLabel(styledVector) {
     const pos = this.toCanvasCoords(styledVector.vector2);
     const labelElement = document.createElement("div");
     labelElement.className = "vector-label";

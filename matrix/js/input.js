@@ -55,6 +55,7 @@ class InputPanel {
           el.value = this._formatValue(val);
           this.matrix[id.split('-')[1]] = val;
           if (this.onChange) this.onChange();
+          this.view.updateVectorList();
         }
       });
     }
