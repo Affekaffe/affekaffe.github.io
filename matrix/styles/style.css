@@ -249,7 +249,7 @@ canvas#view {
 }
 
 #toggle-added-vectors.hidden {
-  display: none;
+  display: none !important;
 }
 
 

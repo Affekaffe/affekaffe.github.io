@@ -76,7 +76,6 @@ class InputPanel {
     const toggleBtn = document.getElementById('toggle-added-vectors');
     toggleBtn.addEventListener('click', () => {
       this.showAddedVectors = !this.showAddedVectors;
-      toggleBtn.style.display = 'inline-flex';
       toggleBtn.classList.toggle('active', !this.showAddedVectors);
       view.updateVectorList();
       view.update();

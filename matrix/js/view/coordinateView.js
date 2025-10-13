@@ -30,6 +30,7 @@ class CoordinateView {
       if(!this.styledVectors[i].baseVector) this.styledVectors[i].baseVector = this.styledVectors[i].vector2
       this.styledVectors[i].vector2 = matrix_t.matmul(this.styledVectors[i].baseVector);
     }
+    
     this.setCorrectDeviceView();
     this.resizeCanvas();
     this.draw();
@@ -382,8 +383,8 @@ updateVectorList() {
       // Extra vectors
       li.innerHTML = `
         <span style="color:${styled.color}">${label}</span>:
-        <input type="number" step="0.01" value="${styled.vector2.x.toFixed(2)}" style="width:40px" />
-        <input type="number" step="0.01" value="${styled.vector2.y.toFixed(2)}" style="width:40px" />
+        <input type="number" step="0.01" value="${styled.vector2.x.toFixed(2)}" style="width:50px" />
+        <input type="number" step="0.01" value="${styled.vector2.y.toFixed(2)}" style="width:50px" />
       `;
 
       const [xInput, yInput] = li.querySelectorAll("input");

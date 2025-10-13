@@ -1,7 +1,7 @@
 import CoordinateView from "./coordinateView.js";
 
 const touchThreshold = 20;
-const snapThreshold = 0.05;
+const snapThreshold = 5;
 
 class Interaction {
   constructor(app) {
@@ -87,8 +87,8 @@ class Interaction {
 
   _getSnappedPos(pos){
     const snappedPos = pos.clone();
-    if(Math.abs(Math.round(pos.x) - pos.x) < snapThreshold) snappedPos.x = Math.round(pos.x);
-    if(Math.abs(Math.round(pos.y) - pos.y) < snapThreshold) snappedPos.y = Math.round(pos.y);
+    if(Math.abs(Math.round(pos.x) - pos.x) < snapThreshold / this.view.zoom) snappedPos.x = Math.round(pos.x);
+    if(Math.abs(Math.round(pos.y) - pos.y) < snapThreshold / this.view.zoom ) snappedPos.y = Math.round(pos.y);
     return snappedPos;
   }
 
