@@ -243,7 +243,7 @@ class CoordinateView {
 
     for (let i = 0; i < this.basisStyledVectors.length; i++) {
       const vec = this.basisStyledVectors[i];
-      this._drawArrow(ctx, vec.baseVector, setTransparency(vec.color, transValue), lineWidth);
+      this._drawArrow(ctx, vec.baseVector, setTransparency(vec.color, transValue), lineWidth, 10);
     }
     for (let i = 0; i < this.addedStyledVectors.length; i++) {
       const vec = this.addedStyledVectors[i];
@@ -266,16 +266,16 @@ class CoordinateView {
     }
   }
 
-  _drawArrow(ctx, vec, color, lineWidth) {
+  _drawArrow(ctx, vec, color, lineWidth, topSize = 20) {
     const origin = this.toCanvasCoords(new Vector2(0, 0));
     const end = this.toCanvasCoords(vec);
 
     this._drawLine(origin.x, origin.y, end.x, end.y, color, lineWidth);
-    this._drawArrowhead(ctx, origin, end, color);
+    this._drawArrowhead(ctx, origin, end, color, topSize);
   }
 
-  _drawArrowhead(ctx, start, end, color) {
-    const headLength = 20; // pixel size of arrowhead
+  _drawArrowhead(ctx, start, end, color, size = 20) {
+    const headLength = size; // pixel size of arrowhead
     const angle = Math.atan2(end.y - start.y, end.x - start.x);
 
     ctx.beginPath();
