@@ -27,6 +27,9 @@ class InputPanel {
 
     /** @type {boolean} */
     this.showDeterminant = false;
+    
+    /** @type {boolean} */
+    this.showGhostVectors = false;
   }
 
   initUI(){
@@ -117,6 +120,12 @@ class InputPanel {
     const showDeterminantCheck = document.getElementById("show-determinant");
     showDeterminantCheck.addEventListener("change", (e) => {
       this.showDeterminant = e.target.checked;
+      if (this.onChange) this.onChange();
+    });
+
+    const showGhostVectorsCheck = document.getElementById("show-ghost-vectors");
+    showGhostVectorsCheck.addEventListener("change", (e) => {
+      this.showGhostVectors = e.target.checked;
       if (this.onChange) this.onChange();
     });
   }

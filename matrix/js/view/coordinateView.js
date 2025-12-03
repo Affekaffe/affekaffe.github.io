@@ -231,11 +231,26 @@ class CoordinateView {
 
     const lineWidth = 3;
 
+    if (this.input.showGhostVectors) this._drawGhostVectors(ctx, lineWidth);
     this._drawAllBasisVectors(ctx, lineWidth);
     this._drawAllAddedVectors(ctx, lineWidth);
 
     ctx.restore();
   }
+
+  _drawGhostVectors(ctx, lineWidth) {
+    const transValue = 0.5;
+
+    for (let i = 0; i < this.basisStyledVectors.length; i++) {
+      const vec = this.basisStyledVectors[i];
+      this._drawArrow(ctx, vec.baseVector, setTransparency(vec.color, transValue), lineWidth);
+    }
+    for (let i = 0; i < this.addedStyledVectors.length; i++) {
+      const vec = this.addedStyledVectors[i];
+      this._drawArrow(ctx, vec.baseVector, setTransparency(vec.color, transValue), lineWidth);
+    }
+}
+
 
   _drawAllAddedVectors(ctx, lineWidth) {
     for (let i = 0; i < this.addedStyledVectors.length; i++) {
@@ -522,6 +537,17 @@ class CoordinateView {
     ctx.font = "14px monospace";
     ctx.fillText(`${det.toFixed(2)}`, center.x - 16, center.y);
   }
+}
+
+function setTransparency(color, value) {
+  const div = document.createElement("div");
+  div.style.color = color;
+  document.body.appendChild(div);
+
+  const rgb = getComputedStyle(div).color;
+  document.body.removeChild(div);
+
+  return rgb.replace("rgb(", "rgba(").replace(")", `, ${value})`);
 }
 
 export default CoordinateView
