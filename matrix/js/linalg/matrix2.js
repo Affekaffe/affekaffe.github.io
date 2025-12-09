@@ -78,6 +78,13 @@ class Matrix2 {
     );
   }
 
+  setTo(other){
+    this.a = other.a;
+    this.b = other.b;
+    this.c = other.c;
+    this.d = other.d;
+  }
+
   static identity(){
     return new Matrix2(1, 0, 0, 1)
   }

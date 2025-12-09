@@ -46,7 +46,7 @@ html, body {
 #matrix-input {
   display: grid;
   grid-template-columns: repeat(2, 70px);
-  grid-gap: 5px;
+  grid-gap: 0px;
 }
 
 #matrix-input-container {
@@ -54,21 +54,39 @@ html, body {
   font-weight: bold;
   display: flex;         
   align-items: center;   
-  gap: 10px;        
+  gap: 1px;        
   color: #cccccc;      
 }
 
 #matrix-input input {
   width: 70px;
-  padding: 5px;
+  padding: 1px;
   text-align: left;
-  font-size: 1rem;
+  font-size: 1.2rem;
   font-weight: bold;
 }
 
+#matrix-n {
+  display: grid;
+  grid-template-columns: repeat(2, 60px);
+  grid-gap: 1px;
+}
+
+#matrix-n input {
+  width: 60px;
+  padding: 1px;
+  text-align: left;
+  font-size: 1rem;
+  font-weight: bold;
+  background-color: #cccccc;
+}
+
 #identity-button {
-  font-family: 'Merriweather', 'Times New Roman', serif;
-  font-size: 22px;  /* adjust to match your other buttons */
+  margin-left: 18px;
+}
+
+#multiply-n-button {
+  margin-right: 8px;
 }
 
 /* Slider */
@@ -181,12 +199,13 @@ canvas#view {
   background-color: #555;
 }
 
-.reset-button {
+.matrix-button {
+  width: auto;
   color: #222222;
   background-color: #cccccc;
 }
 
-.reset-button:hover {
+.matrix-button:hover {
   background-color: #aaaaaa; 
 }
 

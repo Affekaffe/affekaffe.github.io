@@ -60,8 +60,8 @@ class CoordinateView {
     this.updateVectorList();
   }
 
-  update(matrix = this.transformationMatrix, t = 1) {
-    const matrix_t = Matrix2.identity().lerp(matrix, t)
+  update(matrix = this.transformationMatrix, t = 1, startMatrix = Matrix2.identity()) {
+    const matrix_t = startMatrix.lerp(matrix, t)
 
     this.transformationMatrix = matrix_t;
     let basisX = this.basisStyledVectors[0];

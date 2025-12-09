@@ -15,9 +15,14 @@ class InputPanel {
 
     /** @type {Matrix2} */
     this.matrix = Matrix2.identity();
+    /** @type {Matrix2} */
+    this.nMatrix = Matrix2.identity();
 
     /** @type {number} */
     this.sliderValue = 1;
+
+    /** @type {Matrix2} */
+    this.startMatrix = Matrix2.identity();
 
     /** @type {boolean} */
     this.showAddedVectors = true;
@@ -40,29 +45,24 @@ class InputPanel {
     const keys = ['a', 'b', 'c', 'd']; // Matrix2 properties
     ids.forEach((id, i) => {
     document.getElementById(id).value = this.matrix[keys[i]];
+    });
     
-    }); 
+    const nIds = ['n-a', 'n-b', 'n-c', 'n-d'];
+    nIds.forEach((id, i) => {
+    document.getElementById(id).value = this.nMatrix[keys[i]];
+    });
     this.bindUI();
   } 
 
   bindUI() {
-  const view = this.view;  
+    const view = this.view;  
 
-  const fields = ['mat-a', 'mat-b', 'mat-c', 'mat-d'];
-  fields.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) {
-      el.addEventListener('change', () => {
-        const val = parseFloat(el.value);
-        if (!isNaN(val)) {
-          el.value = this._formatValue(val);
-          this.matrix[id.split('-')[1]] = val;
-          if (this.onChange) this.onChange();
-          this.view.updateVectorList();
-        }
-      });
-    }
-  })
+    const fields = ['mat-a', 'mat-b', 'mat-c', 'mat-d'];
+    const nFields = ['n-a', 'n-b', 'n-c', 'n-d'];
+
+    this._addMatrixEntriesParsing(this.matrix, fields);
+    this._addMatrixEntriesParsing(this.nMatrix, nFields);
+
 
     // Slider
     const slider = document.getElementById('transform-slider');
@@ -96,15 +96,33 @@ class InputPanel {
 
     const identityButton = document.getElementById("identity-button");
     identityButton.addEventListener("click", () => {
-      this.matrix = Matrix2.identity();
-      this.updateMatrixInputs();  
+      this.startMatrix.setTo(Matrix2.identity());
+      this.matrix.setTo(Matrix2.identity());
+      this.updateMatrix(false);  
     })
 
-    const toggleBtn = document.getElementById('toggle-added-vectors');
-    toggleBtn.style.display = "inline-flex";
-    toggleBtn.addEventListener('click', () => {
+    const squareButton = document.getElementById("square-button");
+    squareButton.addEventListener("click", () => {
+      this.startMatrix.setTo(this.matrix);
+      this.matrix.setTo(this.matrix.matmul(this.matrix)); // M × M
+      this.updateMatrixAndAnimate();
+    });
+    
+    const multplyByNButton = document.getElementById("multiply-n-button");
+    multplyByNButton.addEventListener("click", () => {
+      console.log(this.matrix)
+      this.startMatrix.setTo(this.matrix);
+      this.matrix.setTo(this.matrix.matmul(this.nMatrix));
+      console.log(this.matrix)
+      this.updateMatrixAndAnimate();
+    });
+
+
+    const toggleAddedVectorsButton = document.getElementById('toggle-added-vectors');
+    toggleAddedVectorsButton.style.display = "inline-flex";
+    toggleAddedVectorsButton.addEventListener('click', () => {
       this.showAddedVectors = !this.showAddedVectors;
-      toggleBtn.classList.toggle('active', !this.showAddedVectors);
+      toggleAddedVectorsButton.classList.toggle('active', !this.showAddedVectors);
       view.updateVectorList();
       view.update();
     });
@@ -130,6 +148,32 @@ class InputPanel {
     });
   }
 
+  updateMatrixAndAnimate() {
+    this.setSliderValue(0);
+    this.updateMatrix(false);
+    this.view.startAnimation();
+  }
+
+  //Right now the ids must have mat-a or n-a form, that is just unnecessary.
+  _addMatrixEntriesParsing(matrix, fields) {
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        console.log(el, id, matrix, fields)
+        el.addEventListener('change', () => {
+          const val = parseFloat(el.value);
+          if (!isNaN(val)) {
+            el.value = this._formatValue(val);
+            matrix[id.split('-')[1]] = val;
+            if (this.onChange) this.onChange();
+            this.view.updateVectorList();
+            this.updateMatrix();
+          }
+        });
+      }
+    });
+  }
+
   setSliderValue(value) {
     this.sliderValue = value;
 
@@ -137,6 +181,12 @@ class InputPanel {
     if (slider) slider.value = value;
 
     if (this.onChange) this.onChange();
+  }
+
+  updateMatrix(resetStartMatrix=true) {
+    if (resetStartMatrix) this.startMatrix.setTo(Matrix2.identity());
+    this.updateNMatrixInputs();
+    this.updateMatrixInputs()
   }
 
   updateMatrixInputs() {
@@ -152,6 +202,24 @@ class InputPanel {
     c.value = this._formatValue(this.matrix.c);
     d.value = this._formatValue(this.matrix.d);
 
+    
+    if (this.onChange) this.onChange();
+  }
+
+  updateNMatrixInputs() {
+    
+    const a = document.getElementById('n-a');
+    const b = document.getElementById('n-b');
+    const c = document.getElementById('n-c');
+    const d = document.getElementById('n-d');
+
+    if (!a || !b || !c || !d) return;
+
+    a.value = this._formatValue(this.nMatrix.a);
+    b.value = this._formatValue(this.nMatrix.b);
+    c.value = this._formatValue(this.nMatrix.c);
+    d.value = this._formatValue(this.nMatrix.d);
+
     if (this.onChange) this.onChange();
   }
 
@@ -161,6 +229,10 @@ class InputPanel {
 
   getSliderValue() {
     return this.sliderValue
+  }
+
+  getStartMatrix() {
+    return this.startMatrix;
   }
 
   _formatValue(value) {

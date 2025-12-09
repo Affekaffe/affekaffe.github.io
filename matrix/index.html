@@ -11,16 +11,26 @@
     <div id="controls">
       <div id="matrix-input-and-buttons">
         <div id="matrix-input-container">
-          <p>Matrix:</p>
-          <div id="matrix-input">
-          <input type="number" id="mat-a" value="1" step="any" inputmode="decimal">
-          <input type="number" id="mat-b" value="0" step="any" inputmode="decimal">
-          <input type="number" id="mat-c" value="0" step="any" inputmode="decimal">
-          <input type="number" id="mat-d" value="1" step="any" inputmode="decimal">
+          <p>M:</p>
+          <div id="matrix-input" class="matrix-input">
+            <input type="number" id="mat-a" value="1" step="any" inputmode="decimal">
+            <input type="number" id="mat-b" value="0" step="any" inputmode="decimal">
+            <input type="number" id="mat-c" value="0" step="any" inputmode="decimal">
+            <input type="number" id="mat-d" value="1" step="any" inputmode="decimal">
           </div>
           <div>
-          <button id="identity-button" class="button-control reset-button" title="Set to the identity matrix">I</button>
+            <button id="identity-button" class="button-control matrix-button" title="Set to the identity matrix">I</button>
+            <button id="square-button" class="button-control matrix-button" title="Multiply by M">M²</button>
+            <button id="multiply-n-button" class="button-control matrix-button">M × N</button>
           </div>
+          <p>N:</p>
+          <div id="matrix-n" class="matrix-input">
+            <input id="n-a" type="number" step="0.01">
+            <input id="n-b" type="number" step="0.01">
+            <input id="n-c" type="number" step="0.01">
+            <input id="n-d" type="number" step="0.01">
+          </div>
+
         </div>
 
       <div id="object-control-container">

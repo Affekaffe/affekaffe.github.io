@@ -42,8 +42,9 @@ class App {
   update() {
     const matrix = this.input.getMatrix();
     const t = this.input.getSliderValue();
+    const animateFromMatrix = this.input.getStartMatrix();
 
-    this.view.update(matrix, t)
+    this.view.update(matrix, t, animateFromMatrix)
   }
 }
 

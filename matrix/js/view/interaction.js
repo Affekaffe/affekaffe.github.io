@@ -105,7 +105,7 @@ class Interaction {
     }
 
     this.view.updateVectorList();
-    this.input.updateMatrixInputs();
+    this.input.updateMatrix();
   }
 
 
