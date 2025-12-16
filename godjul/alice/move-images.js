@@ -14,8 +14,8 @@ window.addEventListener("resize", resizeCanvas);
 
 // Image filenames for each page
 const images = [
-  `${prefix}0.PNG`,
-  `${prefix}3.PNG`
+  `${prefix}4.png`,
+  `${prefix}5.png`
 ];
 // Number of copies per image
 const copies = 2;
