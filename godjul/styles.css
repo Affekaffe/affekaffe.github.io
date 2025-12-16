@@ -1,0 +1,55 @@
+#button-container {
+  position: fixed;
+  bottom: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 20px;
+  z-index: 5;
+}
+
+#button-container button {
+  padding: 15px 25px;
+  font-size: 20px;
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-weight: bold;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(45deg, #ff3b3b, #ffb93b);
+  color: white;
+  cursor: pointer;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.5);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#button-container button:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 4px 4px 12px rgba(0,0,0,0.6);
+}
+#header-text {
+  position: fixed;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 70px;
+  color: #ff3b3b; /* festive red */
+  font-family: 'Comic Sans MS', cursive, sans-serif;
+  font-weight: bold;
+  text-align: center;
+  text-shadow:
+    3px 3px 6px #000,
+    -2px -2px 4px #fff;
+  z-index: 4;
+  pointer-events: none;
+
+  /* optional subtle wobble */
+  animation: wobbleText 2s ease-in-out infinite alternate;
+}
+
+@keyframes wobbleText {
+  0%   { transform: translateX(-50%) rotate(-2deg); }
+  25%  { transform: translateX(-50%) rotate(2deg); }
+  50%  { transform: translateX(-50%) rotate(-1deg); }
+  75%  { transform: translateX(-50%) rotate(1deg); }
+  100% { transform: translateX(-50%) rotate(0deg); }
+}
