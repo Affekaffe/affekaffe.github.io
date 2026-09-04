@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TATA24 — Exercise 1</title>
+
+    <link rel="stylesheet" href="../linear.css">
+</head>
+
+
+<body>
+
+<div id="app">
+
+    <!-- =====================================================
+         TOP BAR
+         ===================================================== -->
+
+    <header id="topbar">
+
+        <div id="course-title">
+             Övning 1 😎
+        </div>
+
+        <div id="slide-number">
+            1 / 10
+        </div>
+
+    </header>
+
+
+    <!-- =====================================================
+         SLIDES
+         ===================================================== -->
+
+    <main id="slides">
+
+
+        <!-- =================================================
+             SLIDE 1
+             ================================================= -->
+
+        <section class="slide active" data-slide="1">
+
+            <div class="slide-content">
+
+                <h1>Linjer</h1>
+
+                <div class="interactive">
+                    <div class="canvas-container">
+                        <canvas
+                            id="line-canvas"
+                            class="linear-canvas">
+                        </canvas>
+                        
+                        <div class="vector-info">
+
+                            <div class="vector-row">
+                                <strong>p</strong> =
+                                <span class="column-vector">
+                                    <span id="point-x">2.0</span>
+                                    <span id="point-y">1.0</span>
+                                </span>
+                            </div>
+
+                            <div class="vector-row">
+                                <strong>v</strong> =
+                                <span class="column-vector">
+                                    <span id="direction-x">2.0</span>
+                                    <span id="direction-y">1.0</span>
+                                </span>
+                            </div>
+                            <div
+                                id="success-message"
+                                class="success-message">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+                <div class="description">
+
+                    <p class="discussion-label">
+                        Ovan ser du en mycket vacker graf som bland annat inkluderar en röd linje.
+                        <br>En linje kan beskrivas med en punkt och en vektor enligt:
+                    </p>
+
+                </div>
+                 <div class="equation">
+                        <b>x</b> = <b>p</b> + t <b>v</b>
+                </div>
+                <div class="task">  
+                    <p>
+                        Uppgift: 
+                            Hitta en punkt och vektor vars uppspända linje sammanfaller 
+                            med den röda linjen, genom att dra i punkten och vektorn.
+                        </p>
+                </div> 
+
+                    
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga 1:
+                    </p>
+
+                    <p>
+                        Är varje linje entydigt bestämd av en punkt och en vektor? <br>
+                        Eller kan man bilda samma linje på flera sätt?
+                    </p>
+
+                </div>
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga 2:
+                    </p>    
+                    <p>
+                        Varför räcker det inte att beskriva alla linjer med bara en vektor?
+                        Varför behövs punkten?
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             SLIDE 2
+             ================================================= -->
+
+        <section class="slide" data-slide="2">
+
+            <div class="slide-content">
+
+                <h1>Två linjer – ett ekvationssystem</h1>
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="system-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+                    </div>
+
+                </div>
+
+                <div class="description">
+
+                    <p>
+                        Betrakta de två linjerna som två ekvationer.
+                    </p>
+
+                    <div class="system">
+                        <div>
+                            x + y = 4
+                        </div>
+                        <div>
+                            x - y = 2
+                        </div>
+                    </div>
+
+                    <p>
+                        Vad betyder det geometriskt att lösa ekvationssystemet?
+                    </p>
+
+                </div>
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga 1:
+                    </p>
+
+                    <p>
+                        Vad motsvarar lösningen till ekvationssystemet
+                        i bilden?
+                    </p>
+
+                </div>
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga 2:
+                    </p>
+
+                    <p>
+                        Vad händer om vi ändrar den ena ekvationen
+                        så att linjerna blir parallella?
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             SLIDE 3
+             ================================================= -->
+
+        <section class="slide" data-slide="3">
+
+            <div class="slide-content">
+
+                <h1>Coordinates</h1>
+
+                <div class="question">
+
+                    <p>
+                        How could we describe the vector
+                        using numbers?
+                    </p>
+
+                    <p>
+                        Experiment with the vector and
+                        discuss what the two coordinates mean.
+                    </p>
+
+                </div>
+
+
+                <div class="interactive">
+
+                    <canvas id="view"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SLIDE 4
+             ================================================= -->
+
+        <section class="slide" data-slide="4">
+
+            <div class="slide-content">
+
+                <h1>Scalar multiplication</h1>
+
+                <div class="question">
+
+                    <p>
+                        What happens when we multiply a
+                        vector by a number?
+                    </p>
+
+                    <p>
+                        Try different values of the parameter.
+                    </p>
+
+                </div>
+
+
+                <div class="interactive">
+
+                    <canvas id="view"></canvas>
+
+                    <div id="slider-container">
+
+                        <label for="transform-slider">
+                            Parameter:
+                        </label>
+
+                        <input
+                            type="range"
+                            id="transform-slider"
+                            min="-3"
+                            max="3"
+                            step="0.1"
+                            value="1"
+                        >
+
+                        <span id="slider-value">
+                            1
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SLIDE 5
+             ================================================= -->
+
+        <section class="slide" data-slide="5">
+
+            <div class="slide-content">
+
+                <h1>Adding vectors</h1>
+
+                <div class="question">
+
+                    <p>
+                        What does it mean geometrically
+                        to add two vectors?
+                    </p>
+
+                    <p>
+                        Can you find a useful geometric rule?
+                    </p>
+
+                </div>
+
+
+                <div class="interactive">
+
+                    <canvas id="view"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SLIDE 6
+             ================================================= -->
+
+        <section class="slide" data-slide="6">
+
+            <div class="slide-content">
+
+                <h1>Linear combinations</h1>
+
+                <div class="question">
+
+                    <p>
+                        What points can you reach by changing
+                        the coefficients of the two vectors?
+                    </p>
+
+                </div>
+
+
+                <div class="interactive">
+
+                    <canvas id="view"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SLIDE 7
+             ================================================= -->
+
+        <section class="slide" data-slide="7">
+
+            <div class="slide-content">
+
+                <h1>Dependence</h1>
+
+                <div class="question">
+
+                    <p>
+                        Experiment with the two vectors.
+                    </p>
+
+                    <p>
+                        When can one vector be obtained
+                        by scaling the other?
+                    </p>
+
+                </div>
+
+
+                <div class="interactive">
+
+                    <canvas id="view"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SLIDE 8
+             ================================================= -->
+
+        <section class="slide" data-slide="8">
+
+            <div class="slide-content">
+
+                <h1>Which vectors are needed?</h1>
+
+                <div class="question">
+
+                    <p>
+                        Can you construct one of these vectors
+                        from the others?
+                    </p>
+
+                </div>
+
+
+                <div class="interactive">
+
+                    <canvas id="view"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SLIDE 9
+             ================================================= -->
+
+        <section class="slide" data-slide="9">
+
+            <div class="slide-content">
+
+                <h1>A challenge</h1>
+
+                <div class="question">
+
+                    <p>
+                        Can your group find numbers
+                        <strong>a</strong> and <strong>b</strong>
+                        such that
+                    </p>
+
+                    <p>
+                        a u + b v = p
+                    </p>
+
+                </div>
+
+
+                <div class="interactive">
+
+                    <canvas id="view"></canvas>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             SLIDE 10
+             ================================================= -->
+
+        <section class="slide" data-slide="10">
+
+            <div class="slide-content">
+
+                <h1>Reflection</h1>
+
+                <div class="question">
+
+                    <p>
+                        Discuss with your group:
+                    </p>
+
+                    <ul>
+
+                        <li>
+                            What is a vector?
+                        </li>
+
+                        <li>
+                            What does scalar multiplication
+                            mean geometrically?
+                        </li>
+
+                        <li>
+                            What does it mean for vectors
+                            to span something?
+                        </li>
+
+                        <li>
+                            What does linear independence mean
+                            in your own words?
+                        </li>
+
+                    </ul>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- =====================================================
+         NAVIGATION
+         ===================================================== -->
+
+    <footer id="navigation">
+
+        <button
+            id="previous"
+            class="nav-button"
+        >
+            ← Back
+        </button>
+
+
+        <div id="progress">
+
+            <span class="progress-dot active"
+                  data-slide="1"></span>
+
+            <span class="progress-dot"
+                  data-slide="2"></span>
+
+            <span class="progress-dot"
+                  data-slide="3"></span>
+
+            <span class="progress-dot"
+                  data-slide="4"></span>
+
+            <span class="progress-dot"
+                  data-slide="5"></span>
+
+            <span class="progress-dot"
+                  data-slide="6"></span>
+
+            <span class="progress-dot"
+                  data-slide="7"></span>
+
+            <span class="progress-dot"
+                  data-slide="8"></span>
+
+            <span class="progress-dot"
+                  data-slide="9"></span>
+
+            <span class="progress-dot"
+                  data-slide="10"></span>
+
+        </div>
+
+
+        <button
+            id="next"
+            class="nav-button"
+        >
+            Next →
+        </button>
+
+    </footer>
+
+</div>
+
+
+<script src="../linear.js"></script>
+<script type="module" src="ex1/ex1.js"></script>
+
+</body>
+
+</html>
