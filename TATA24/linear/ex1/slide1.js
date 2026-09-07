@@ -1,6 +1,10 @@
 import { Vector } from "../geometry/vector.js";
 import { Line } from "../geometry/line.js";
 import { CoordinateCanvas } from "../geometry/canvas.js";
+import {
+    drawLine,
+    drawVector
+} from "../geometry/drawing.js";
 
 export function initSlide1() {
 
@@ -14,24 +18,32 @@ export function initSlide1() {
     const coordinateCanvas =
         new CoordinateCanvas(canvasElement);
 
-    const ctx = coordinateCanvas.ctx;
 
     const COLORS = {
-        point: "#0761d6",
-        vector: "#0052bc",
-        line: "#56a8ff",
+        point: "#006eff",
+        vector: "#00ff73",
+        line: "#c7f1ff",
         target: "#e74c3c"
     };
 
+
+    // --------------------------------------------------
     // Student's line
-    let studentPoint =
-        new Vector(2, 1);
+    // --------------------------------------------------
 
-    let studentDirection =
-        new Vector(2, 1);
+    // p is now a position vector
+    let vectorU =
+        new Vector(2, 0);
+
+    // v is the direction vector
+    let vectorV =
+        new Vector(0, 2);
 
 
+    // --------------------------------------------------
     // Target line
+    // --------------------------------------------------
+
     function createTargetLine() {
 
         const angle =
@@ -49,8 +61,12 @@ export function initSlide1() {
                 (Math.random() - 0.5) * 4
             );
 
-        return new Line(point, direction);
+        return new Line(
+            point,
+            direction
+        );
     }
+
 
     const targetLine =
         createTargetLine();
@@ -63,140 +79,21 @@ export function initSlide1() {
     // Drawing
     // --------------------------------------------------
 
-    function drawLine(line, style, width = 2) {
-
-        const p =
-            coordinateCanvas.toScreen(line.point);
-
-        const direction =
-            line.direction.normalized();
-
-        const extension =
-            Math.max(
-                coordinateCanvas.width,
-                coordinateCanvas.height
-            );
-
-        const start = {
-            x: p.x - direction.x * extension,
-            y: p.y + direction.y * extension
-        };
-
-        const end = {
-            x: p.x + direction.x * extension,
-            y: p.y - direction.y * extension
-        };
-
-        ctx.strokeStyle = style;
-        ctx.lineWidth = width;
-
-        ctx.beginPath();
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-    }
-
-
-    function drawVector(point, vector) {
-
-        const start =
-            coordinateCanvas.toScreen(point);
-
-        const end =
-            coordinateCanvas.toScreen(
-                point.add(vector)
-            );
-
-        ctx.strokeStyle = COLORS.vector;
-        ctx.fillStyle = COLORS.vector;
-        ctx.lineWidth = 4;
-
-        // Vector shaft
-        ctx.beginPath();
-        ctx.moveTo(start.x, start.y);
-        ctx.lineTo(end.x, end.y);
-        ctx.stroke();
-
-        // Arrow head
-        const angle =
-            Math.atan2(
-                end.y - start.y,
-                end.x - start.x
-            );
-
-        const size = 12;
-
-        ctx.beginPath();
-
-        ctx.moveTo(end.x, end.y);
-
-        ctx.lineTo(
-            end.x -
-            size * Math.cos(angle - Math.PI / 6),
-
-            end.y -
-            size * Math.sin(angle - Math.PI / 6)
-        );
-
-        ctx.lineTo(
-            end.x -
-            size * Math.cos(angle + Math.PI / 6),
-
-            end.y -
-            size * Math.sin(angle + Math.PI / 6)
-        );
-
-        ctx.closePath();
-        ctx.fillStyle = COLORS.vector;
-        ctx.fill();
-
-
-        // Point
-        ctx.fillStyle = COLORS.point;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            start.x,
-            start.y,
-            8,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fill();
-
-
-        // Labels
-        ctx.font = "bold 22px sans-serif";
-
-        ctx.fillText(
-            "p",
-            start.x + 12,
-            start.y - 12
-        );
-
-        ctx.fillText(
-            "v",
-            end.x + 10,
-            end.y - 10
-        );
-    }
-
-
     function draw() {
 
         coordinateCanvas.drawGrid();
 
+
         const studentLine =
             new Line(
-                studentPoint,
-                studentDirection
+                vectorU,
+                vectorV
             );
 
 
-        // Target
+        // Target line
         drawLine(
+            coordinateCanvas,
             targetLine,
             COLORS.target,
             3
@@ -205,16 +102,30 @@ export function initSlide1() {
 
         // Student line
         drawLine(
+            coordinateCanvas,
             studentLine,
             COLORS.line,
-            2
+            2,
+            true
+        );
+
+        // Position vector p
+        drawVector(
+            coordinateCanvas,
+            new Vector(0, 0),
+            vectorU,
+            COLORS.point,
+            "u"
         );
 
 
-        // Student vector
+        // Direction vector v
         drawVector(
-            studentPoint,
-            studentDirection
+            coordinateCanvas,
+            vectorU,
+            vectorV,
+            COLORS.vector,
+            "v"
         );
 
 
@@ -230,26 +141,28 @@ export function initSlide1() {
 
         document.getElementById("point-x")
             .textContent =
-            studentPoint.x.toFixed(1);
+            vectorU.x.toFixed(1);
 
         document.getElementById("point-y")
             .textContent =
-            studentPoint.y.toFixed(1);
+            vectorU.y.toFixed(1);
 
         document.getElementById("direction-x")
             .textContent =
-            studentDirection.x.toFixed(1);
+            vectorV.x.toFixed(1);
 
         document.getElementById("direction-y")
             .textContent =
-            studentDirection.y.toFixed(1);
+            vectorV.y.toFixed(1);
 
 
         const success =
             line.coincidesWith(targetLine);
 
+
         const status =
             document.getElementById("success-message");
+
 
         if (success) {
 
@@ -287,20 +200,30 @@ export function initSlide1() {
             const mouse =
                 coordinateCanvas.pointerPosition(event);
 
-            const p =
+
+            // Tip of position vector p
+            const pointScreen =
                 coordinateCanvas.toScreen(
-                    studentPoint
+                    vectorU
                 );
 
-            const tip =
+
+            // Tip of direction vector v
+            const tipScreen =
                 coordinateCanvas.toScreen(
-                    studentPoint.add(
-                        studentDirection
+                    vectorU.add(
+                        vectorV
                     )
                 );
 
 
-            if (distance(mouse, tip) < 20) {
+            // Drag direction vector
+            if (
+                distance(
+                    mouse,
+                    tipScreen
+                ) < 20
+            ) {
 
                 dragging = "direction";
 
@@ -308,7 +231,14 @@ export function initSlide1() {
                     event.pointerId
                 );
 
-            } else if (distance(mouse, p) < 20) {
+
+            // Drag position vector
+            } else if (
+                distance(
+                    mouse,
+                    pointScreen
+                ) < 20
+            ) {
 
                 dragging = "point";
 
@@ -324,10 +254,14 @@ export function initSlide1() {
         "pointermove",
         event => {
 
-            if (!dragging) return;
+            if (!dragging) {
+                return;
+            }
+
 
             const mouse =
                 coordinateCanvas.pointerPosition(event);
+
 
             const position =
                 coordinateCanvas.toMath(
@@ -336,27 +270,38 @@ export function initSlide1() {
                 );
 
 
+            // Move position vector p
             if (dragging === "point") {
 
-                studentPoint =
-                    new Vector(
-                        Math.round(position.x * 10) / 10,
-                        Math.round(position.y * 10) / 10
-                    );
-
-            } else {
-
-                studentDirection =
+                vectorU =
                     new Vector(
                         Math.round(
-                            (position.x - studentPoint.x) * 10
+                            position.x * 10
                         ) / 10,
 
                         Math.round(
-                            (position.y - studentPoint.y) * 10
+                            position.y * 10
+                        ) / 10
+                    );
+
+
+            // Change direction vector v
+            } else {
+
+                vectorV =
+                    new Vector(
+                        Math.round(
+                            (position.x -
+                                vectorU.x) * 10
+                        ) / 10,
+
+                        Math.round(
+                            (position.y -
+                                vectorU.y) * 10
                         ) / 10
                     );
             }
+
 
             draw();
         }
@@ -383,7 +328,17 @@ export function initSlide1() {
         }
     );
 
+
+    // --------------------------------------------------
+    // Initial draw
+    // --------------------------------------------------
+
     draw();
+
+
+    // --------------------------------------------------
+    // Resize
+    // --------------------------------------------------
 
     window.addEventListener(
         "resize",

@@ -1,298 +1,323 @@
+import { Vector } from "../geometry/vector.js";
+import { Line } from "../geometry/line.js";
+import { CoordinateCanvas } from "../geometry/canvas.js";
+import {
+    drawLine,
+    drawPoint,
+    drawVector
+} from "../geometry/drawing.js";
+
+
 export function initSlide2() {
+
+    // --------------------------------------------------
+    // Setup
+    // --------------------------------------------------
 
     const canvas =
         document.getElementById("system-canvas");
 
     if (!canvas) {
-        throw new Error("Could not find #system-canvas");
+        throw new Error(
+            "Could not find #system-canvas"
+        );
     }
 
     const coordinateCanvas =
         new CoordinateCanvas(canvas);
 
-    /* =========================================================
-    LINES
-    ========================================================= */
 
-    const line1 = new Line(
-        new Vector(-2, 1),
-        new Vector(1, 0.5)
-    );
+    // --------------------------------------------------
+    // Lines
+    // --------------------------------------------------
 
-    const line2 = new Line(
-        new Vector(1, -2),
-        new Vector(-0.5, 1)
-    );
+    const line1 =
+        new Line(
+            new Vector(-2, 1),
+            new Vector(1, 0.5)
+        );
+
+    let vectorU =
+        new Vector(1.5, 0);
+
+    let vectorV =
+        new Vector(-0.5, 1);
 
 
-    /* =========================================================
-    COLORS
-    ========================================================= */
+
+    // --------------------------------------------------
+    // Colors
+    // --------------------------------------------------
 
     const COLORS = {
-        line1: "#56a8ff",
-        line2: "#e74c3c"
+        line1: "#e74c3c",
+        line2: "#56a8ff",
+        vectorV: "#006eff",
+        vectorU: "#00ff73"
     };
 
 
-    /* =========================================================
-    DRAW LINE
-    ========================================================= */
-
-    function drawLine(line, color, width = 3) {
-
-        const ctx = coordinateCanvas.ctx;
-
-        const direction = line.direction.normalized();
-
-        const length = Math.max(
-            coordinateCanvas.width,
-            coordinateCanvas.height
-        ) / coordinateCanvas.scale * 2;
-
-        const start = line.point.subtract(
-            direction.multiply(length)
-        );
-
-        const end = line.point.add(
-            direction.multiply(length)
-        );
-
-        const startScreen = coordinateCanvas.toScreen(start);
-        const endScreen = coordinateCanvas.toScreen(end);
-
-        ctx.beginPath();
-
-        ctx.moveTo(
-            startScreen.x,
-            startScreen.y
-        );
-
-        ctx.lineTo(
-            endScreen.x,
-            endScreen.y
-        );
-
-        ctx.strokeStyle = color;
-        ctx.lineWidth = width;
-
-        ctx.stroke();
-    }
-
-
-    /* =========================================================
-    DRAW
-    ========================================================= */
+    // --------------------------------------------------
+    // Drawing
+    // --------------------------------------------------
 
     function draw() {
 
         coordinateCanvas.drawGrid();
 
+
+        // Line 1
         drawLine(
+            coordinateCanvas,
             line1,
             COLORS.line1
         );
 
+
+        // Line 2
+        const line2 =
+            new Line(
+                vectorU,
+                vectorV
+            );
+
         drawLine(
+            coordinateCanvas,
             line2,
             COLORS.line2
         );
 
-        drawIntersection();
-    }
+
+        // Position vector u
+        drawVector(
+            coordinateCanvas,
+            new Vector(0, 0),
+            vectorU,
+            COLORS.vectorU,
+            "u"
+        );
 
 
-
-    /* =========================================================
-    INTERSECTION
-    ========================================================= */
-
-    function getIntersection(lineA, lineB) {
-
-        const p = lineA.point;
-        const r = lineA.direction;
-
-        const q = lineB.point;
-        const s = lineB.direction;
-
-        const cross =
-            r.x * s.y -
-            r.y * s.x;
-
-        // Parallel lines
-        if (Math.abs(cross) < 0.000001) {
-            return null;
-        }
-
-        const qMinusP = q.subtract(p);
-
-        const t =
-            (qMinusP.x * s.y -
-            qMinusP.y * s.x) / cross;
-
-        return lineA.pointAt(t);
-    }
+        // Direction vector v
+        drawVector(
+            coordinateCanvas,
+            vectorU,
+            vectorV,
+            COLORS.vectorV,
+            "v"
+        );
 
 
-    function drawIntersection() {
-
+        // Intersection
         const intersection =
-            getIntersection(line1, line2);
+            line1.intersectionWith(line2);
 
-        if (!intersection) {
-            return;
+        if (intersection) {
+
+            drawPoint(
+                coordinateCanvas,
+                intersection
+            );
         }
-
-        const screen =
-            coordinateCanvas.toScreen(intersection);
-
-        const ctx = coordinateCanvas.ctx;
-
-        ctx.beginPath();
-
-        ctx.arc(
-            screen.x,
-            screen.y,
-            7,
-            0,
-            Math.PI * 2
-        );
-
-        ctx.fillStyle = "#fff";
-        ctx.fill();
-
-        ctx.strokeStyle = "#111";
-        ctx.lineWidth = 2;
-        ctx.stroke();
     }
 
 
-    /* =========================================================
-    DRAGGING
-    ========================================================= */
+    // --------------------------------------------------
+    // Dragging
+    // --------------------------------------------------
 
-    let dragging = false;
-    let dragStart = null;
+    let dragging = null;
 
-    canvas.addEventListener("pointerdown", event => {
+    canvas.addEventListener(
+        "pointerdown",
+        event => {
 
-        const position =
-            coordinateCanvas.pointerPosition(event);
+            const mouse =
+                coordinateCanvas.pointerPosition(event);
 
-        const mathPosition =
-            coordinateCanvas.toMath(
-                position.x,
-                position.y
-            );
 
-        /*
-        * Find the closest point on line2.
-        */
+            // Tip of position vector u
+            const uScreen =
+                coordinateCanvas.toScreen(
+                    vectorU
+                );
 
-        const difference =
-            new Vector(
-                mathPosition.x - line2.point.x,
-                mathPosition.y - line2.point.y
-            );
 
-        const direction =
-            line2.direction;
+            // Tip of direction vector v
+            const vTipScreen =
+                coordinateCanvas.toScreen(
+                    vectorU.add(vectorV)
+                );
 
-        const directionLengthSquared =
-            direction.x ** 2 +
-            direction.y ** 2;
 
-        const t =
-            (
-                difference.x * direction.x +
-                difference.y * direction.y
-            ) /
-            directionLengthSquared;
+            // Drag direction vector
+            if (
+                distance(
+                    mouse,
+                    vTipScreen
+                ) < 20
+            ) {
 
-        const closestPoint =
-            line2.pointAt(t);
+                dragging = "direction";
 
-        const distance =
-            closestPoint.subtract(
+                canvas.setPointerCapture(
+                    event.pointerId
+                );
+
+
+            // Drag position vector
+            } else if (
+                distance(
+                    mouse,
+                    uScreen
+                ) < 20
+            ) {
+
+                dragging = "point";
+
+                canvas.setPointerCapture(
+                    event.pointerId
+                );
+            }
+        }
+    );
+
+    canvas.addEventListener(
+        "pointermove",
+        event => {
+
+            if (!dragging) {
+                return;
+            }
+
+
+            const position =
+                coordinateCanvas.pointerPosition(event);
+
+            const mathPosition =
+                coordinateCanvas.toMath(
+                    position.x,
+                    position.y
+                );
+
+
+            // Move u
+            if (dragging === "point") {
+
+            vectorU =
                 new Vector(
-                    mathPosition.x,
-                    mathPosition.y
-                )
-            ).length();
+                    Math.round(mathPosition.x * 10) / 10,
+                    Math.round(mathPosition.y * 10) / 10
+                );
 
-        if (distance < 0.25) {
 
-            dragging = true;
+            // Change v
+            } else {
 
-            dragStart = {
-                x: mathPosition.x,
-                y: mathPosition.y
-            };
+                const newVector =
+                    new Vector(
+                        Math.round(
+                            (mathPosition.x - vectorU.x) * 10
+                        ) / 10,
 
-            canvas.setPointerCapture(event.pointerId);
+                        Math.round(
+                            (mathPosition.y - vectorU.y) * 10
+                        ) / 10
+                    );
+
+                vectorV =
+                    snapToLineDirection(newVector);
+            }
+
+
+            draw();
         }
-    });
+    );
 
+    canvas.addEventListener(
+        "pointerup",
+        event => {
 
-    canvas.addEventListener("pointermove", event => {
+            dragging = null;
 
-        if (!dragging) {
-            return;
-        }
-
-        const position =
-            coordinateCanvas.pointerPosition(event);
-
-        const mathPosition =
-            coordinateCanvas.toMath(
-                position.x,
-                position.y
+            canvas.releasePointerCapture(
+                event.pointerId
             );
+        }
+    );
 
-        const dx =
-            mathPosition.x - dragStart.x;
+    canvas.addEventListener(
+        "pointercancel",
+        () => {
+            dragging = null;
+        }
+    );
 
-        const dy =
-            mathPosition.y - dragStart.y;
+    // --------------------------------------------------
+    // Resize
+    // --------------------------------------------------
 
-        line2.point.x += dx;
-        line2.point.y += dy;
+    window.addEventListener(
+        "resize",
+        draw
+    );
 
-        dragStart = {
-            x: mathPosition.x,
-            y: mathPosition.y
-        };
+    //Helpers
+    function distance(a, b) {
 
-        draw();
-    });
-
-
-    canvas.addEventListener("pointerup", event => {
-
-        dragging = false;
-
-        canvas.releasePointerCapture(
-            event.pointerId
+        return Math.sqrt(
+            (a.x - b.x) ** 2 +
+            (a.y - b.y) ** 2
         );
-    });
+    }
+
+    function snapToLineDirection(vector) {
+
+        const targetDirection =
+            line1.direction.normalized();
+
+        const length =
+            vector.length();
+
+        if (length === 0) {
+            return vector;
+        }
+
+        const currentDirection =
+            vector.normalized();
+
+        const dot =
+            currentDirection.x * targetDirection.x +
+            currentDirection.y * targetDirection.y;
+
+        const clampedDot =
+            Math.max(-1, Math.min(1, dot));
+
+        const angle =
+            Math.acos(clampedDot);
+
+        // Snap if within 3 degrees
+        const snapAngle =
+            3 * Math.PI / 180;
+
+        if (angle < snapAngle) {
+
+            return targetDirection.multiply(length);
+        }
+
+        // Also snap if pointing in the opposite direction
+        if (Math.abs(angle - Math.PI) < snapAngle) {
+
+            return targetDirection.multiply(-length);
+        }
+
+        return vector;
+    }
 
 
-    canvas.addEventListener("pointercancel", () => {
-        dragging = false;
-    });
-
-
-    /* =========================================================
-    RESIZE
-    ========================================================= */
-
-    window.addEventListener("resize", draw);
-
-
-    /* =========================================================
-    INITIAL DRAW
-    ========================================================= */
+    // --------------------------------------------------
+    // Initial draw
+    // --------------------------------------------------
 
     draw();
-
 }

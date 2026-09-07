@@ -13,6 +13,35 @@ export class Line {
         );
     }
 
+    intersectionWith(other) {
+
+        const p = this.point;
+        const r = this.direction;
+
+        const q = other.point;
+        const s = other.direction;
+
+        const cross =
+            r.x * s.y -
+            r.y * s.x;
+
+        // Parallel lines do not have a unique intersection
+        if (Math.abs(cross) < 0.000001) {
+            return null;
+        }
+
+        const qMinusP =
+            q.subtract(p);
+
+        const t =
+            (
+                qMinusP.x * s.y -
+                qMinusP.y * s.x
+            ) / cross;
+
+        return this.pointAt(t);
+    }
+
     // Check whether a point lies approximately on the line
     containsPoint(point, tolerance = 0.1) {
 

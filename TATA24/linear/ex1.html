@@ -26,7 +26,7 @@
     <header id="topbar">
 
         <div id="course-title">
-             Övning 1 😎
+             Mentorspass 1 😎
         </div>
 
         <div id="slide-number">
@@ -63,7 +63,7 @@
                         <div class="vector-info">
 
                             <div class="vector-row">
-                                <strong>p</strong> =
+                                <strong>u</strong> =
                                 <span class="column-vector">
                                     <span id="point-x">2.0</span>
                                     <span id="point-y">1.0</span>
@@ -89,21 +89,24 @@
 
                 <div class="description">
 
-                    <p class="discussion-label">
+                    <p>
                         Ovan ser du en mycket vacker graf som bland annat inkluderar en röd linje.
-                        <br>En linje kan beskrivas med en punkt och en vektor enligt:
+                        <br>Ett sätt att beskriva en linje är med två vektorer u och v enligt:
                     </p>
 
-                </div>
+                
                  <div class="equation">
-                        <b>x</b> = <b>p</b> + t <b>v</b>
+                        <b>x</b> = <b>u</b> + t<b>v</b> &nbsp&nbspt ∈ ℝ
                 </div>
+
+                <p>
+                        Ekvationen säger att vi får alla punkter <b>x</b> på linjen genom att börja från <b>u</b>, och addera t<b>v</b>, för alla reella tal t.
+                    </p>
+                    </div>
                 <div class="task">  
                     <p>
-                        Uppgift: 
-                            Hitta en punkt och vektor vars uppspända linje sammanfaller 
-                            med den röda linjen, genom att dra i punkten och vektorn.
-                        </p>
+                        Uppgift: Hitta två vektorer i grafen som kan beskriva den röda linjen. (Genom att dra i vektorerna.)
+                    </p>
                 </div> 
 
                     
@@ -125,8 +128,7 @@
                         Fråga 2:
                     </p>    
                     <p>
-                        Varför räcker det inte att beskriva alla linjer med bara en vektor?
-                        Varför behövs punkten?
+                        Varför behövs det två vektorer för att beskriva alla linjer? Varför inte en?
                     </p>
 
                 </div>
@@ -143,7 +145,7 @@
 
             <div class="slide-content">
 
-                <h1>Två linjer – ett ekvationssystem</h1>
+                <h1>Två linjer</h1>
 
                 <div class="interactive">
 
@@ -161,20 +163,292 @@
                 <div class="description">
 
                     <p>
-                        Betrakta de två linjerna som två ekvationer.
+                        Två linjer i två dimensioner kan beskrivas med ett ekvationssystem med två ekvationer, en för varje linje.
+                        Dessa kan ha en lösning, ingen lösning, eller oändligt många lösningar. Du kan testa att hitta alla fall genom att dra i vektorerna ovan.
                     </p>
 
+                    <p>
+                        <br>
+                        Lösningen till ett ekvationssystem av linjer motsvarar de punkter
+                        som ligger på båda linjerna samtidigt.
+                    </p>
+
+                </div>
+                <div class="systems-row">
+
                     <div class="system">
-                        <div>
-                            x + y = 4
-                        </div>
-                        <div>
-                            x - y = 2
+                        <div class="system-label">A)</div>
+                        <div class="equation">
+                            <div>x + y = 4</div>
+                            <div>x + y = 6</div>
                         </div>
                     </div>
 
+                    <div class="system">
+                        <div class="system-label">B)</div>
+                        <div class="equation">
+
+                            <div>x + y = 4</div>
+                            <div>x - y = 2</div>
+                        </div>
+                    </div>
+
+                    <div class="system">
+                        <div class="system-label">C)</div>
+                        <div class="equation">
+                            <div>x + y = 4</div>
+                            <div>2x + 2y = 8</div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift:
+                    </p>
+
                     <p>
-                        Vad betyder det geometriskt att lösa ekvationssystemet?
+                        Para ihop varje ekvationssystem ovan med rätt typ av lösning.
+                    </p>
+
+                    <p>
+                        <b>1.</b> En lösning
+                    </p>
+
+                    <p>
+                        <b>2.</b> Ingen lösning
+                    </p>
+
+                    <p>
+                        <b>3.</b> Oändligt många lösningar
+                    </p>
+
+                </div>
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga:
+                    </p>
+
+                    <p>
+                        I två dimensioner så betraktas inga lösningar och oändligt många lösningar som specialfall
+                        av lösningsrummen, eftersom två linjer i 2D oftast har exakt en lösning.
+                    </p>
+                    <p>
+                        Om vi istället har två linjer i <b>tre</b> dimensioner, blir det samma specialfall då?
+                    </p>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- =================================================
+             SLIDE 3
+             ================================================= -->
+
+        <section class="slide" data-slide="3">
+            <div class="slide-content">
+
+                <h1>Basvektorer</h1>
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="basis-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+                        <div class="vector-info">
+
+                                <div class="vector-row">
+                                    a<b>u</b>+ b<b>v</b> =
+                                    <span class="column-vector">
+                                        <span id="basis-result-x">0.0</span>
+                                        <span id="basis-result-y">0.0</span>
+                                    </span>
+                                </div>
+
+                            <div id="basis-success"></div>
+
+                        </div>
+
+                        <div class="basis-controls">
+
+                            <div class="basis-control">
+
+                                <label for="basis-a-slider">
+                                    a =
+                                    <span id="basis-a">0.0</span>
+                                </label>
+
+                                <input
+                                    id="basis-a-slider"
+                                    type="range"
+                                    min="-5"
+                                    max="5"
+                                    step="0.25"
+                                    value="0"
+                                >
+
+                            </div>
+
+                            <div class="basis-control">
+
+                                <label for="basis-b-slider">
+                                    b =
+                                    <span id="basis-b">0.0</span>
+                                </label>
+
+                                <input
+                                    id="basis-b-slider"
+                                    type="range"
+                                    min="-5"
+                                    max="5"
+                                    step="0.25"
+                                    value="0"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="description">
+                    <p>
+                        En bas (i två dimensioner) består av två vektorer som inte är parallella.
+                        Alla vektorer i planet kan beskrivas som en linjärkombination av de två basvektorerna.
+                    </p>
+                </div>
+
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift:
+                    </p>
+
+                    <p>
+                        Hitta tal a och b så att den röda punkten beskrivs av vektorn au + bv.
+                    </p>
+                    <p> 
+                        Det vill säga, hitta koordinaterna (a,b) för punkten i basen med basvektorer u och v.
+                    </p>
+
+                </div>
+
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga 1:
+                    </p>
+
+                    <p>
+                        Kraven för en bas är att basvektorerna spänner upp hela rummet, samt att de är linjärt oberoende.
+                        I två dimensioner innebär detta att en bas är två vektorer som inte är parallella. Vad händer om basvektorerna är parallella?
+                        Kan man då spänna upp hela planet, alltså kan man nå alla punkter?
+                    </p>
+                </div>
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga 2:
+                    </p>
+
+                    <p>
+                        I tre dimensioner krävs tre linjärt oberoende vektorer för att bilda en bas.
+                        Till skillnad från två dimensioner räcker det inte med att de är icke-parallella.
+                        Varför?
+                    </p>
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- =================================================
+             SLIDE 4
+             ================================================= -->
+
+        <section class="slide" data-slide="4">
+            <div class="slide-content">
+
+                <h1>Skalärprodukt</h1>
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="dot-product-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+                        <div class="vector-info">
+
+                            <div class="equation">
+                                u · v =
+                                <span id="dot-product-value">
+                                    0.00
+                                </span>
+                            </div>
+
+                            <div>
+                                θ =
+                                <span id="dot-product-angle">
+                                    0.0°
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="description">
+
+                    <p>
+                        Vi har två vektorer <b>u</b> och <b>v</b>.
+                        Dra i vektorerna för att se vad deras skalärprodukt är.
+                        Skalärprodukten av u och v definieras vanligtvis:
+                    </p>
+                    
+
+                </div>
+
+                 <div class="equation">
+                    <b>u · v</b> =
+                    |<b>u</b>||<b>v</b>|cos(θ)
+                </div>
+                
+                <div class="description">
+
+                    <p>
+                        Skalärprodukten är 0 när vektorerna är ortogonala, alltså vinkelräta mot varandra.
+                        Den är som mest positiv när de pekar åt samma håll, och som mest negativ när de pekar åt olika håll.
+                    </p>
+                    
+
+                </div>
+
+
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift:
+                    </p>
+
+                    <p>
+                        Låt den ena vektorn u peka rakt uppåt. Försök att hitta en vektor <b>v</b> så att <b>u · v</b> = 0.
+                        Det finns oändligt många vektorer <b>v</b> som löser <b>u · v</b> = 0. Vilka vektorer är det?
                     </p>
 
                 </div>
@@ -186,8 +460,8 @@
                     </p>
 
                     <p>
-                        Vad motsvarar lösningen till ekvationssystemet
-                        i bilden?
+                        Tidigare beskrev vi en linje med hjälp av två vektorer och en parameter t.
+                        Hur kan vi, med hjälp av uppgiften ovan, använda skalärprodukten för att beskriva en linje?
                     </p>
 
                 </div>
@@ -199,320 +473,166 @@
                     </p>
 
                     <p>
-                        Vad händer om vi ändrar den ena ekvationen
-                        så att linjerna blir parallella?
+                        Ett verkligt scenario där skalärprodukten kan användas är krafter:
+                        <br>
+                        Låt en vektor vara kraften från vinden som blåser åt vektorns riktning,
+                        och den andra vara ett tåg på en räls som pekar åt den andra vektorns riktning.
+
+                        Vad beskriver skalärprodukten mellan dessa två vektorer?
                     </p>
 
                 </div>
 
             </div>
-
-        </section>
-
-        <!-- =================================================
-             SLIDE 3
-             ================================================= -->
-
-        <section class="slide" data-slide="3">
-
-            <div class="slide-content">
-
-                <h1>Coordinates</h1>
-
-                <div class="question">
-
-                    <p>
-                        How could we describe the vector
-                        using numbers?
-                    </p>
-
-                    <p>
-                        Experiment with the vector and
-                        discuss what the two coordinates mean.
-                    </p>
-
-                </div>
-
-
-                <div class="interactive">
-
-                    <canvas id="view"></canvas>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             SLIDE 4
-             ================================================= -->
-
-        <section class="slide" data-slide="4">
-
-            <div class="slide-content">
-
-                <h1>Scalar multiplication</h1>
-
-                <div class="question">
-
-                    <p>
-                        What happens when we multiply a
-                        vector by a number?
-                    </p>
-
-                    <p>
-                        Try different values of the parameter.
-                    </p>
-
-                </div>
-
-
-                <div class="interactive">
-
-                    <canvas id="view"></canvas>
-
-                    <div id="slider-container">
-
-                        <label for="transform-slider">
-                            Parameter:
-                        </label>
-
-                        <input
-                            type="range"
-                            id="transform-slider"
-                            min="-3"
-                            max="3"
-                            step="0.1"
-                            value="1"
-                        >
-
-                        <span id="slider-value">
-                            1
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
         </section>
 
 
         <!-- =================================================
              SLIDE 5
              ================================================= -->
-
         <section class="slide" data-slide="5">
-
             <div class="slide-content">
 
-                <h1>Adding vectors</h1>
+                <h1>Projektion</h1>
 
-                <div class="question">
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="projection-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+                        <div class="vector-info">
+
+                            <div>
+                                u · v =
+                                <span id="projection-dot-product">
+                                    0.00
+                                </span>
+                            </div>
+
+                            <div>
+                                |v<sub>∥</sub>| =
+                                <span id="projection-parallel-length">
+                                    0.00
+                                </span>
+                            </div>
+
+                            <div>
+                                |v<sub>⊥</sub>| =
+                                <span id="projection-perpendicular-length">
+                                    0.00
+                                </span>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="description">
 
                     <p>
-                        What does it mean geometrically
-                        to add two vectors?
-                    </p>
-
-                    <p>
-                        Can you find a useful geometric rule?
+                        Vektorn <b>v</b> kan delas upp i två delar:
+                        en del som pekar i samma riktning som <b>u</b>,
+                        och en del som är vinkelrät mot <b>u</b>.
                     </p>
 
                 </div>
 
+                <div class="equation">
+                    <b>v</b> = <b>v<sub>∥</sub></b> + <b>v<sub>⊥</sub></b>
+                </div>
 
-                <div class="interactive">
+                <div class="task">
+                    <p class="discussion-label">
+                        Uppgift 1:
+                    </p>
 
-                    <canvas id="view"></canvas>
+                    <p>
+                        Dra i vektorn <b>v</b> (den vita) till ett ställe så att <b>u · v</b> = 5.
+                        Försök hitta ett annat ställe där <b>u · v</b> = 5. Vilka vektorer <b>v</b> löser <b>u · v</b> = 5?
+                    </p>
+
+                </div>
+
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift 2:
+                    </p>
+
+                    <p>
+                        a. Bestäm <b>u · u</b> genom att dra vektorn <b>v</b> till vektorn <b>u</b>. Vad är <b>u · u</b>?<br>
+                        b. Dra nu vektorn <b>v</b> så den är hälften så lång som vektorn <b>u</b> (och fortfarande parallell). <br>&nbsp&nbsp&nbsp&nbspVad är 0.5(<b>u · u</b>)?<br>
+                        c. Kan du med hjälp av uppgift 1 och 2 hitta ett samband mellan <b>v<sub>∥</sub></b> och <b>u · v</b>?
+                    </p>
+
+                </div>
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga:
+                    </p>
+
+                    <p>
+                        De två vektorerna <b>v<sub>∥</sub></b> och <b>v<sub>⊥</sub></b> kallas för komposanterna av <b>v</b>.
+                        Genom att använda sambandet från Uppgift 2 kan man bestämma båda komposanter med hjälp av <b>v</b> = <b>v<sub>∥</sub></b> + <b>v<sub>⊥</sub></b>.
+                        Vad får du om du komposantuppdelar en vektor <b>v</b> längs en (ON-)basvektor <u>e</u><sub>1</sub>?  
+                    </p>
 
                 </div>
 
             </div>
-
         </section>
 
 
         <!-- =================================================
-             SLIDE 6
-             ================================================= -->
+            SLIDE 6
+            ================================================= -->
 
         <section class="slide" data-slide="6">
 
             <div class="slide-content">
 
-                <h1>Linear combinations</h1>
-
-                <div class="question">
-
-                    <p>
-                        What points can you reach by changing
-                        the coefficients of the two vectors?
-                    </p>
-
-                </div>
-
+                <h1>Basis ball - the game</h1>
 
                 <div class="interactive">
+                    <div class="maze-game">
+                        <div class="canvas-container">
 
-                    <canvas id="view"></canvas>
+                            <div class="maze-overlay" id="maze-overlay">
+                                <button
+                                    id="maze-start-button"
+                                    class="maze-start-button">
+                                    Start
+                                </button>
+                            </div>
 
+                            <canvas
+                                id="maze-canvas"
+                                class="linear-canvas">
+                            </canvas>
+
+                        </div>
+                    </div>
                 </div>
 
+                <div>
+                    <p>
+                        Piltangenterna styr bollen. Väggarna är dödlig röd edamerost.
+                    </p>
+                </div>
             </div>
 
         </section>
 
 
-        <!-- =================================================
-             SLIDE 7
-             ================================================= -->
-
-        <section class="slide" data-slide="7">
-
-            <div class="slide-content">
-
-                <h1>Dependence</h1>
-
-                <div class="question">
-
-                    <p>
-                        Experiment with the two vectors.
-                    </p>
-
-                    <p>
-                        When can one vector be obtained
-                        by scaling the other?
-                    </p>
-
-                </div>
-
-
-                <div class="interactive">
-
-                    <canvas id="view"></canvas>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             SLIDE 8
-             ================================================= -->
-
-        <section class="slide" data-slide="8">
-
-            <div class="slide-content">
-
-                <h1>Which vectors are needed?</h1>
-
-                <div class="question">
-
-                    <p>
-                        Can you construct one of these vectors
-                        from the others?
-                    </p>
-
-                </div>
-
-
-                <div class="interactive">
-
-                    <canvas id="view"></canvas>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             SLIDE 9
-             ================================================= -->
-
-        <section class="slide" data-slide="9">
-
-            <div class="slide-content">
-
-                <h1>A challenge</h1>
-
-                <div class="question">
-
-                    <p>
-                        Can your group find numbers
-                        <strong>a</strong> and <strong>b</strong>
-                        such that
-                    </p>
-
-                    <p>
-                        a u + b v = p
-                    </p>
-
-                </div>
-
-
-                <div class="interactive">
-
-                    <canvas id="view"></canvas>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- =================================================
-             SLIDE 10
-             ================================================= -->
-
-        <section class="slide" data-slide="10">
-
-            <div class="slide-content">
-
-                <h1>Reflection</h1>
-
-                <div class="question">
-
-                    <p>
-                        Discuss with your group:
-                    </p>
-
-                    <ul>
-
-                        <li>
-                            What is a vector?
-                        </li>
-
-                        <li>
-                            What does scalar multiplication
-                            mean geometrically?
-                        </li>
-
-                        <li>
-                            What does it mean for vectors
-                            to span something?
-                        </li>
-
-                        <li>
-                            What does linear independence mean
-                            in your own words?
-                        </li>
-
-                    </ul>
-
-                </div>
-
-            </div>
-
-        </section>
+                        
 
 
     </main>
@@ -548,22 +668,9 @@
 
             <span class="progress-dot"
                   data-slide="5"></span>
-
+                  
             <span class="progress-dot"
                   data-slide="6"></span>
-
-            <span class="progress-dot"
-                  data-slide="7"></span>
-
-            <span class="progress-dot"
-                  data-slide="8"></span>
-
-            <span class="progress-dot"
-                  data-slide="9"></span>
-
-            <span class="progress-dot"
-                  data-slide="10"></span>
-
         </div>
 
 
