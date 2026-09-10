@@ -1,0 +1,1159 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TATA77 - Föreläsning 1</title>
+
+    <link
+        rel="stylesheet"
+        href="../css/style.css"
+    >
+</head>
+
+<body>
+
+    <main class="course">
+
+        <header class="lecture-header">
+
+            <a
+                href="../index.html"
+                class="back-button"
+            >
+                ← TATA77
+            </a>
+
+
+            <div
+                id="slide-number"
+                class="slide-number"
+            >
+                1 / 6
+            </div>
+
+
+            <button
+                id="top-next"
+                class="top-next-button"
+            >
+                Nästa →
+            </button>
+
+        </header>
+
+
+        <div id="slides">
+
+
+            <!-- ================================================= -->
+            <!-- SLIDE 1 - INLEDNING -->
+            <!-- ================================================= -->
+
+            <section
+                class="slide active"
+                data-slide="1"
+            >
+
+                <div class="slide-content">
+
+                    <h1>
+                        Inledning
+                    </h1>
+
+
+                    <div class="description">
+
+                        <p>
+                            Vi börjar med en funktion som beskriver
+                            en koncentrerad mängd massa.
+                        </p>
+
+                        <p>
+                            Titta på vad som händer när
+                            <b>n</b> blir större.
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            ρₙ(x) =
+                            <span style="white-space: nowrap;">
+                                {
+                                n, &nbsp; |x| ≤ 1/(2n)
+                                }
+                            </span>
+                        </div>
+
+                        <p>
+                            och ρₙ(x) = 0 annars.
+                        </p>
+
+                    </div>
+
+
+                    <div class="interactive">
+
+                        <div class="canvas-container">
+
+                            <canvas
+                                id="density-canvas"
+                                class="fourier-canvas">
+                            </canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="slider-container">
+
+                        <label for="density-slider">
+                            Öka n:
+                        </label>
+
+                        <input
+                            type="range"
+                            id="density-slider"
+                            min="1"
+                            max="50"
+                            value="1"
+                            step="1"
+                        >
+
+                    </div>
+
+
+                    <div class="density-info">
+
+                        <div>
+                            n =
+                            <span id="density-n">
+                                1
+                            </span>
+                        </div>
+
+                        <div>
+                            bredd =
+                            <span id="density-width">
+                                1.000
+                            </span>
+                        </div>
+
+                        <div>
+                            höjd =
+                            <span id="density-height">
+                                1.000
+                            </span>
+                        </div>
+
+                        <div>
+                            area =
+                            <span id="density-area">
+                                1.000
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Fundera
+                        </p>
+
+                        <p>
+                            1. Vad händer med bredden när
+                            <b>n</b> ökar?
+                        </p>
+
+                        <p>
+                            2. Vad händer med höjden?
+                        </p>
+
+                        <p>
+                            3. Vad händer med arean?
+                        </p>
+
+                        <p>
+                            4. För ett fast <b>x ≠ 0</b> —
+                            vad verkar hända med ρₙ(x)?
+                        </p>
+
+                        <p>
+                            5. Vad händer vid <b>x = 0</b>?
+                        </p>
+
+                        <p>
+                            6. Kan ρₙ konvergera till en
+                            vanlig funktion?
+                        </p>
+
+                    </div>
+
+
+                    <div class="description">
+
+                        <p>
+                            Något konstigt händer:
+                            massan koncentreras allt mer kring
+                            <b>x = 0</b>, men den totala massan
+                            är fortfarande 1.
+                        </p>
+
+                        <p>
+                            <b>
+                                Hur beskriver man matematiskt
+                                något som koncentreras till en punkt?
+                            </b>
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- SLIDE 2 - FUNKTIONSRUM OCH KONVERGENS -->
+            <!-- ================================================= -->
+
+            <section
+                class="slide"
+                data-slide="2"
+            >
+
+                <div class="slide-content">
+
+                    <h1>
+                        Funktionsrum och konvergensbegrepp
+                    </h1>
+
+
+                    <div class="description">
+
+                        <p>
+                            Innan vi går vidare behöver vi tänka
+                            lite på vad det egentligen betyder att
+                            en följd av funktioner konvergerar.
+                        </p>
+
+                        <p>
+                            Det finns nämligen flera olika sätt
+                            som funktioner kan närma sig varandra.
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            fₙ(x) = xⁿ
+                        </div>
+
+                        <p>
+                            Betrakta fₙ på intervallet
+                            <b>[0,1]</b>.
+                        </p>
+
+                    </div>
+
+
+                    <div class="interactive">
+
+                        <div class="canvas-container">
+
+                            <canvas
+                                id="convergence-function-canvas"
+                                class="fourier-canvas">
+                            </canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="slider-container">
+
+                        <label for="function-n-slider">
+                            Öka n:
+                        </label>
+
+                        <input
+                            type="range"
+                            id="function-n-slider"
+                            min="1"
+                            max="30"
+                            value="1"
+                            step="1"
+                        >
+
+                    </div>
+
+
+                    <div class="density-info">
+
+                        <div>
+                            n =
+                            <span id="function-n">
+                                1
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Titta på grafen
+                        </p>
+
+                        <p>
+                            1. Vad verkar hända när
+                            <b>n</b> blir större?
+                        </p>
+
+                        <p>
+                            2. Vad händer för ett fast
+                            <b>0 ≤ x &lt; 1</b>?
+                        </p>
+
+                        <p>
+                            3. Vad händer vid <b>x = 1</b>?
+                        </p>
+
+                        <p>
+                            4. Vilken funktion verkar vara
+                            punktvis gräns?
+                        </p>
+
+                        <p>
+                            5. Verkar funktionerna bli
+                            “nära” varandra överallt samtidigt?
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            ‖f‖∞ = sup |f(x)|
+                        </div>
+
+                        <p>
+                            Ett sätt att mäta hur stor en funktion
+                            är är alltså att titta på dess största
+                            absoluta värde.
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Viktig idé
+                        </p>
+
+                        <p>
+                            När vi skriver
+                            <b>fₙ → f</b> måste vi egentligen
+                            fråga:
+                        </p>
+
+                        <p>
+                            <b>
+                                På vilket sätt konvergerar fₙ mot f?
+                            </b>
+                        </p>
+
+                        <p>
+                            Detta blir viktigt när vanlig
+                            punktvis konvergens inte längre
+                            beskriver det vi vill beskriva.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- SLIDE 3 - TESTFUNKTIONER OCH DISTRIBUTIONER -->
+            <!-- ================================================= -->
+
+            <section
+                class="slide"
+                data-slide="3"
+            >
+
+                <div class="slide-content">
+
+                    <h1>
+                        Testfunktioner och distributioner
+                    </h1>
+
+
+                    <div class="description">
+
+                        <p>
+                            Kanske behöver vi inte fråga vad
+                            <b>u(x)</b> är i varje punkt.
+                        </p>
+
+                        <p>
+                            Vi kan istället fråga hur <b>u</b>
+                            reagerar när vi testar den med
+                            en funktion <b>φ</b>.
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            ⟨u, φ⟩ = ∫ u(x)φ(x) dx
+                        </div>
+
+                    </div>
+
+
+                    <div class="interactive">
+
+                        <div class="canvas-container">
+
+                            <canvas
+                                id="test-function-canvas"
+                                class="fourier-canvas">
+                            </canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="slider-container">
+
+                        <label for="test-function-position">
+                            Flytta φ:
+                        </label>
+
+                        <input
+                            type="range"
+                            id="test-function-position"
+                            min="-1.5"
+                            max="1.5"
+                            value="0"
+                            step="0.01"
+                        >
+
+                    </div>
+
+
+                    <div class="density-info">
+
+                        <div>
+                            ⟨u, φ⟩ =
+                            <span id="test-function-pairing">
+                                0.000
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Experimentera
+                        </p>
+
+                        <p>
+                            1. Flytta φ. Vad händer med
+                            <b>⟨u,φ⟩</b>?
+                        </p>
+
+                        <p>
+                            2. Vad händer när φ placeras där
+                            u är stor?
+                        </p>
+
+                        <p>
+                            3. Vad händer där u är nära noll?
+                        </p>
+
+                        <p>
+                            4. Vad tror du händer om φ byter tecken?
+                        </p>
+
+                        <p>
+                            5. Vad verkar integralen egentligen
+                            mäta?
+                        </p>
+
+                    </div>
+
+
+                    <div class="description">
+
+                        <p>
+                            Tänk på φ som ett slags
+                            <b>filter eller förstoringsglas</b>.
+                        </p>
+
+                        <p>
+                            Genom att välja olika testfunktioner
+                            kan vi undersöka olika egenskaper hos u.
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            ⟨δ, φ⟩ = φ(0)
+                        </div>
+
+                        <p>
+                            Delta behöver alltså inte beskrivas
+                            genom ett vanligt punktvärde.
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Fundera
+                        </p>
+
+                        <p>
+                            6. Vad gör δ med testfunktionen?
+                        </p>
+
+                        <p>
+                            7. Är δ en vanlig funktion?
+                        </p>
+
+                        <p>
+                            8. Varför kan det vara mer praktiskt
+                            att beskriva δ genom vad den gör?
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- SLIDE 4 - RESTRIKTION -->
+            <!-- ================================================= -->
+
+            <section
+                class="slide"
+                data-slide="4"
+            >
+
+                <div class="slide-content">
+
+                    <h1>
+                        Restriktion av distributioner
+                    </h1>
+
+
+                    <div class="description">
+
+                        <p>
+                            Hittills har vi betraktat funktioner
+                            på hela vårt område.
+                        </p>
+
+                        <p>
+                            Men ibland vill vi bara undersöka
+                            vad som händer i en del av området.
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            Ω = (−1, 1)
+                        </div>
+
+                        <p>
+                            Tänk att vi bara är intresserade av
+                            vad som händer inne i Ω.
+                        </p>
+
+                    </div>
+
+
+                    <div class="interactive">
+
+                        <div class="canvas-container">
+
+                            <canvas
+                                id="restriction-canvas"
+                                class="fourier-canvas">
+                            </canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="slider-container">
+
+                        <label for="restriction-position">
+                            Flytta testfunktionen:
+                        </label>
+
+                        <input
+                            type="range"
+                            id="restriction-position"
+                            min="-1.5"
+                            max="1.5"
+                            value="0"
+                            step="0.01"
+                        >
+
+                    </div>
+
+
+                    <div class="density-info">
+
+                        <div>
+                            φ:s centrum =
+                            <span id="restriction-position-value">
+                                0.00
+                            </span>
+                        </div>
+
+                        <div>
+                            ligger i Ω:
+                            <span id="restriction-inside">
+                                ja
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Fundera
+                        </p>
+
+                        <p>
+                            1. Vad betyder det intuitivt att
+                            “bara titta på u inne i Ω”?
+                        </p>
+
+                        <p>
+                            2. Vad händer när φ ligger helt
+                            inne i Ω?
+                        </p>
+
+                        <p>
+                            3. Vad händer när φ flyttas utanför Ω?
+                        </p>
+
+                        <p>
+                            4. Varför är testfunktionens stöd viktigt?
+                        </p>
+
+                        <p>
+                            5. Kan två distributioner vara olika
+                            utanför Ω men ändå se likadana ut
+                            när vi bara undersöker Ω?
+                        </p>
+
+                    </div>
+
+
+                    <div class="description">
+
+                        <p>
+                            För en vanlig funktion känns detta
+                            ganska naturligt: vi begränsar helt
+                            enkelt funktionen till området.
+                        </p>
+
+                        <p>
+                            För distributioner uttrycker vi samma
+                            idé genom vilka testfunktioner vi får
+                            använda.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- SLIDE 5 - KONVERGENS AV DISTRIBUTIONER -->
+            <!-- ================================================= -->
+
+            <section
+                class="slide"
+                data-slide="5"
+            >
+
+                <div class="slide-content">
+
+                    <h1>
+                        Konvergens av distributioner
+                    </h1>
+
+
+                    <div class="description">
+
+                        <p>
+                            Nu kan vi återvända till problemet
+                            från början.
+                        </p>
+
+                        <p>
+                            Istället för att titta på
+                            <b>ρₙ(x)</b> punkt för punkt
+                            undersöker vi hur ρₙ verkar på
+                            en testfunktion.
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            ⟨ρₙ, φ⟩ =
+                            n ∫<sub>−1/(2n)</sub><sup>1/(2n)</sup>
+                            φ(x) dx
+                        </div>
+
+                    </div>
+
+
+                    <div class="interactive">
+
+                        <div class="canvas-container">
+
+                            <canvas
+                                id="distribution-convergence-canvas"
+                                class="fourier-canvas">
+                            </canvas>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="slider-container">
+
+                        <label for="distribution-convergence-slider">
+                            Öka n:
+                        </label>
+
+                        <input
+                            type="range"
+                            id="distribution-convergence-slider"
+                            min="1"
+                            max="50"
+                            value="1"
+                            step="1"
+                        >
+
+                    </div>
+
+
+                    <div class="density-info">
+
+                        <div>
+                            n =
+                            <span id="distribution-n">
+                                1
+                            </span>
+                        </div>
+
+                        <div>
+                            ⟨ρₙ, φ⟩ =
+                            <span id="distribution-pairing">
+                                0.00000
+                            </span>
+                        </div>
+
+                        <div>
+                            φ(0) =
+                            <span id="distribution-phi-zero">
+                                1.00000
+                            </span>
+                        </div>
+
+                        <div>
+                            skillnad =
+                            <span id="distribution-error">
+                                0.00000
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Titta noga
+                        </p>
+
+                        <p>
+                            1. Vad händer med ρₙ när n blir större?
+                        </p>
+
+                        <p>
+                            2. Vad händer med
+                            <b>⟨ρₙ,φ⟩</b>?
+                        </p>
+
+                        <p>
+                            3. Vad händer med skillnaden mellan
+                            <b>⟨ρₙ,φ⟩</b> och <b>φ(0)</b>?
+                        </p>
+
+                        <p>
+                            4. Vilket objekt verkar vara gränsen?
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            ρₙ → δ
+                        </div>
+
+                        <p>
+                            i distributionsmening.
+                        </p>
+
+                    </div>
+
+
+                    <div class="formula-box">
+
+                        <div class="formula">
+                            uₙ → u
+                        </div>
+
+                        <p>
+                            om
+                        </p>
+
+                        <div class="formula">
+                            ⟨uₙ, φ⟩ → ⟨u, φ⟩
+                        </div>
+
+                        <p>
+                            för alla testfunktioner φ.
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Viktig fråga
+                        </p>
+
+                        <p>
+                            Varför behövde vi gå via
+                            testfunktioner istället för att
+                            bara titta på punktvärden?
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- ================================================= -->
+            <!-- SLIDE 6 - ÖVNINGAR -->
+            <!-- ================================================= -->
+
+            <section
+                class="slide"
+                data-slide="6"
+            >
+
+                <div class="slide-content">
+
+                    <h1>
+                        Övningar
+                    </h1>
+
+
+                    <div class="description">
+
+                        <p>
+                            Nu testar vi om idéerna från
+                            föreläsningen faktiskt sitter.
+                        </p>
+
+                        <p>
+                            Försök svara själv innan du
+                            öppnar facit.
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Övning 1 — Punktmassan
+                        </p>
+
+                        <p>
+                            För
+                        </p>
+
+                        <div class="formula">
+                            ρₙ(x) =
+                            n, &nbsp; |x| ≤ 1/(2n)
+                        </div>
+
+                        <p>
+                            bestäm:
+                        </p>
+
+                        <p>
+                            a) bredden
+                        </p>
+
+                        <p>
+                            b) höjden
+                        </p>
+
+                        <p>
+                            c) arean
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Övning 2 — Testfunktionen
+                        </p>
+
+                        <p>
+                            Antag
+                        </p>
+
+                        <div class="formula">
+                            φ(x) = e<sup>−4x²</sup>.
+                        </div>
+
+                        <p>
+                            Vad är <b>φ(0)</b>?
+                        </p>
+
+                        <p>
+                            Vad tror du händer med φ(0) om
+                            testfunktionen flyttas bort från
+                            x = 0?
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Övning 3 — Delta
+                        </p>
+
+                        <p>
+                            Fyll i:
+                        </p>
+
+                        <div class="formula">
+                            ⟨δ, φ⟩ = ?
+                        </div>
+
+                        <p>
+                            Vad berättar detta om hur δ fungerar?
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Övning 4 — Vanlig funktion
+                        </p>
+
+                        <p>
+                            För en vanlig funktion gäller
+                        </p>
+
+                        <div class="formula">
+                            ⟨u,φ⟩ =
+                            ∫u(x)φ(x)dx.
+                        </div>
+
+                        <p>
+                            Förklara med egna ord vad denna
+                            integral mäter.
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Övning 5 — Konvergens
+                        </p>
+
+                        <p>
+                            Vilket påstående är rätt?
+                        </p>
+
+                        <p>
+                            <b>A.</b>
+                            ρₙ konvergerar punktvis till δ.
+                        </p>
+
+                        <p>
+                            <b>B.</b>
+                            ρₙ konvergerar distributionellt till δ.
+                        </p>
+
+                        <p>
+                            <b>C.</b>
+                            ρₙ konvergerar distributionellt till 0.
+                        </p>
+
+                    </div>
+
+
+                    <div class="question">
+
+                        <p class="discussion-label">
+                            Övning 6 — Helheten
+                        </p>
+
+                        <p>
+                            Försök förklara följande kedja
+                            utan att titta på tidigare slides:
+                        </p>
+
+                        <div class="formula">
+                            ρₙ
+                            →
+                            ⟨ρₙ,φ⟩
+                            →
+                            φ(0)
+                            →
+                            δ
+                        </div>
+
+                        <p>
+                            Varför är detta ett bättre sätt
+                            att beskriva gränsen än att bara
+                            titta på ρₙ(x)?
+                        </p>
+
+                    </div>
+
+
+                    <div class="description">
+
+                        <p>
+                            <b>
+                                Om du kan förklara den sista
+                                frågan med egna ord har du fångat
+                                huvudidén i den här delen av kursen.
+                            </b>
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </div>
+
+
+        <footer class="navigation">
+
+            <button
+                id="previous"
+                class="navigation-button"
+            >
+                ←
+            </button>
+
+
+            <div
+                id="slide-progress"
+                class="slide-progress"
+            >
+                1 / 6
+            </div>
+
+
+            <button
+                id="next"
+                class="navigation-button"
+            >
+                →
+            </button>
+
+        </footer>
+
+    </main>
+
+
+    <script
+        type="module"
+        src="lecture1.js"
+    ></script>
+
+</body>
+
+</html>

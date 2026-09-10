@@ -16,7 +16,21 @@
 
 
 <body>
+<div class="portrait-warning" id="portrait-warning">
+    <div class="portrait-warning-content">
+        <h2>Rotera din enhet</h2>
 
+        <p>
+            Webbplatsen är utformad för liggande läge.
+        </p>
+
+        <div class="rotate-icon">↻</div>
+
+        <button id="continue-portrait">
+            Jag vill inte
+        </button>
+    </div>
+</div>
 <div id="app">
 
     <!-- =====================================================
@@ -610,13 +624,13 @@
 
                 <div class="interactive">
                     <div class="maze-game">
-                        <div class="canvas-container">
 
+                        <div class="canvas-container">
                             <div class="maze-overlay" id="maze-overlay">
                                 <button
                                     id="maze-start-button"
                                     class="maze-start-button">
-                                    Start
+                                    Starta spelet
                                 </button>
                             </div>
 
@@ -624,14 +638,27 @@
                                 id="maze-canvas"
                                 class="linear-canvas">
                             </canvas>
-
                         </div>
+
+                        <div class="maze-controls">
+                            <div class="maze-controls-u">
+                                <button data-direction="up">↑</button>
+                                <button data-direction="down">↓</button>
+                            </div>
+
+                            <div class="maze-controls-v">
+                                <button data-direction="left">←</button>
+                                <button data-direction="right">→</button>
+                            </div>
+                        </div>
+
                     </div>
                 </div>
 
                 <div>
                     <p>
-                        Piltangenterna styr bollen. Väggarna är dödlig röd edamerost.
+                        Piltangenterna styr bollen. Väggarna är dödlig röd edamerost. <br>
+                        Du kan bara åka i basvektorernas riktningar.
                     </p>
                 </div>
             </div>

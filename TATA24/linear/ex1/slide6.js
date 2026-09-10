@@ -37,7 +37,13 @@ export function initSlide6() {
         player: "#00ff73"
     };
 
-    const WALL_SIZE = 1;
+    // Physical size of the whole playing field.
+    const BOARD_SIZE = 8;
+
+    // Grid starts at 8x8 and increases to 16x16.
+    let gridSize = 8;
+    const MAX_GRID_SIZE = 16;
+
     const PLAYER_RADIUS = 0.18;
 
     const ACCELERATION = 0.003;
@@ -88,22 +94,71 @@ export function initSlide6() {
         right: false
     };
 
+    const controlButtons =
+        document.querySelectorAll(
+            ".maze-controls button"
+        );
+
 
     // =================================================
     // INPUT
     // =================================================
 
-    startButton.addEventListener("click", () => {
-        if (gameStarted) {
-            return;
-        }
+    controlButtons.forEach(button => {
 
-        gameStarted = true;
-        mazeOverlay.style.display = "none";
+        const direction =
+            button.dataset.direction;
 
-        gameLoopRunning = true;
-        gameLoop();
+        button.addEventListener(
+            "pointerdown",
+            event => {
+                event.preventDefault();
+                keys[direction] = true;
+            }
+        );
+
+        button.addEventListener(
+            "pointerup",
+            event => {
+                event.preventDefault();
+                keys[direction] = false;
+            }
+        );
+
+        button.addEventListener(
+            "pointercancel",
+            () => {
+                keys[direction] = false;
+            }
+        );
+
+        button.addEventListener(
+            "pointerleave",
+            () => {
+                keys[direction] = false;
+            }
+        );
     });
+
+
+    startButton.addEventListener(
+        "click",
+        () => {
+
+            if (gameStarted) {
+                return;
+            }
+
+            gameStarted = true;
+
+            mazeOverlay.style.display = "none";
+
+            gameLoopRunning = true;
+
+            gameLoop();
+        }
+    );
+
 
     window.addEventListener(
         "keydown",
@@ -115,6 +170,7 @@ export function initSlide6() {
                 event.key === "ArrowLeft" ||
                 event.key === "ArrowRight"
             ) {
+
                 event.preventDefault();
 
                 if (event.key === "ArrowUp") {
@@ -135,6 +191,7 @@ export function initSlide6() {
             }
         }
     );
+
 
     window.addEventListener(
         "keyup",
@@ -168,17 +225,14 @@ export function initSlide6() {
         const angle =
             Math.random() * Math.PI * 2;
 
-
         u =
             new Vector(
                 Math.cos(angle),
                 Math.sin(angle)
             );
 
-
         let vAngle;
         let candidate;
-
 
         do {
 
@@ -197,7 +251,6 @@ export function initSlide6() {
                 candidate
             ) < MIN_BASIS_ANGLE
         );
-
 
         v = candidate;
     }
@@ -229,8 +282,6 @@ export function initSlide6() {
         const angle =
             Math.acos(value);
 
-        // The smaller angle between the
-        // two directions.
         return Math.min(
             angle,
             Math.PI - angle
@@ -241,42 +292,86 @@ export function initSlide6() {
     // =================================================
     // BOARD
     // =================================================
+    function isSpawnCell(x, y) {
+
+        const cellSize =
+            getCellSize();
+
+        const half =
+            cellSize / 2;
+
+        const centerX =
+            gridToWorld(x);
+
+        const centerY =
+            gridToWorld(y);
+
+        const minX =
+            centerX - half;
+
+        const maxX =
+            centerX + half;
+
+        const minY =
+            centerY - half;
+
+        const maxY =
+            centerY + half;
+
+        const closestX =
+            Math.max(
+                minX,
+                Math.min(0, maxX)
+            );
+
+        const closestY =
+            Math.max(
+                minY,
+                Math.min(0, maxY)
+            );
+
+        const dx = closestX;
+        const dy = closestY;
+
+        return (
+            dx * dx +
+            dy * dy
+            <=
+            (PLAYER_RADIUS + 0.05) ** 2
+        );
+    }
+    function getCellSize() {
+
+        return BOARD_SIZE / gridSize;
+    }
+
 
     function getBoardBounds() {
 
-        const halfWidth =
-            coordinateCanvas.width /
-            coordinateCanvas.scale /
-            2;
-
-        const halfHeight =
-            coordinateCanvas.height /
-            coordinateCanvas.scale /
-            2;
-
+        const half =
+            BOARD_SIZE / 2;
 
         return {
-
-            minX:
-                Math.ceil(
-                    -halfWidth + 0.5
-                ),
-
-            maxX:
-                Math.floor(
-                    halfWidth - 0.5
-                ),
-
-            minY:
-                Math.ceil(
-                    -halfHeight + 0.5
-                ),
-
-            maxY:
-                Math.floor(
-                    halfHeight - 0.5
-                )
+            minX: -half,
+            maxX: half,
+            minY: -half,
+            maxY: half
         };
+    }
+
+
+    function gridToWorld(index) {
+
+        const cellSize =
+            getCellSize();
+
+        const center =
+            (gridSize - 1) / 2;
+
+        return (
+            (index - center) *
+            cellSize
+        );
     }
 
 
@@ -287,7 +382,11 @@ export function initSlide6() {
     function createCourse() {
 
         if (courseTimeout !== null) {
-            clearTimeout(courseTimeout);
+
+            clearTimeout(
+                courseTimeout
+            );
+
             courseTimeout = null;
         }
 
@@ -305,47 +404,56 @@ export function initSlide6() {
         player =
             new Vector(0, 0);
 
-        hitWall = false;
-
-
-        const bounds =
-            getBoardBounds();
-
 
         // -------------------------------------------------
         // Pick goal
         // -------------------------------------------------
 
+        let goalX;
+        let goalY;
+
         do {
 
-            goal =
-                new Vector(
-                    randomGridPosition(
-                        bounds.minX,
-                        bounds.maxX
-                    ),
-                    randomGridPosition(
-                        bounds.minY,
-                        bounds.maxY
-                    )
+            goalX =
+                Math.floor(
+                    Math.random() *
+                    gridSize
+                );
+
+            goalY =
+                Math.floor(
+                    Math.random() *
+                    gridSize
                 );
 
         } while (
-            goal.x === 0 &&
-            goal.y === 0
+            goalX === Math.floor(gridSize / 2) &&
+            goalY === Math.floor(gridSize / 2)
         );
 
 
+        goal =
+            new Vector(
+                gridToWorld(goalX),
+                gridToWorld(goalY)
+            );
+
+
         // -------------------------------------------------
-        // Generate a guaranteed path
+        // Guaranteed path
         // -------------------------------------------------
+
+        const startX = Math.floor(gridSize / 2);
+        const startY = Math.floor(gridSize / 2);
+
+        const start =
+            new Vector(startX, startY);
 
         const path =
             createPath(
-                new Vector(0, 0),
-                goal
+                start,
+                new Vector(goalX, goalY)
             );
-
 
         const pathKeys =
             new Set(
@@ -360,60 +468,62 @@ export function initSlide6() {
 
 
         // -------------------------------------------------
-        // Add random deadly walls.
-        //
-        // Never place one on the guaranteed path.
+        // Random walls
         // -------------------------------------------------
 
-        walls = [];
+        // -------------------------------------------------
+// Random walls
+// -------------------------------------------------
 
+walls = [];
 
-        for (
-            let x = bounds.minX;
-            x <= bounds.maxX;
-            x++
-        ) {
+for (
+    let x = 0;
+    x < gridSize;
+    x++
+) {
 
-            for (
-                let y = bounds.minY;
-                y <= bounds.maxY;
-                y++
-            ) {
+    for (
+        let y = 0;
+        y < gridSize;
+        y++
+    ) {
 
-                const key =
-                    cellKey(x, y);
+        const key =
+            cellKey(x, y);
 
-
-                if (
-                    pathKeys.has(key)
-                ) {
-                    continue;
-                }
-
-
-                if (
-                    Math.random() <
-                    WALL_PROBABILITY
-                ) {
-
-                    walls.push(
-                        new Vector(x, y)
-                    );
-                }
-            }
+        if (pathKeys.has(key)) {
+            continue;
         }
 
+        if (
+            Math.random() <
+            WALL_PROBABILITY
+        ) {
 
-        draw();
+            walls.push({
+                x: gridToWorld(x),
+                y: gridToWorld(y)
+            });
+        }
     }
+}
 
 
-    function randomGridPosition(min, max) {
+// -------------------------------------------------
+// Clear spawn area
+// -------------------------------------------------
 
-        return Math.floor(
-            Math.random() *
-            (max - min + 1)
-        ) + min;
+    walls =
+        walls.filter(
+            wall =>
+                !wallOverlapsPlayer(
+                    wall,
+                    new Vector(0, 0)
+                )
+        );
+
+    draw();
     }
 
 
@@ -428,13 +538,13 @@ export function initSlide6() {
         let x = start.x;
         let y = start.y;
 
-
         path.push(
             new Vector(x, y)
         );
 
 
-        // Move horizontally first.
+        // Horizontal first.
+
         while (x !== goal.x) {
 
             x +=
@@ -448,7 +558,8 @@ export function initSlide6() {
         }
 
 
-        // Then vertically.
+        // Vertical second.
+
         while (y !== goal.y) {
 
             y +=
@@ -460,7 +571,6 @@ export function initSlide6() {
                 new Vector(x, y)
             );
         }
-
 
         return path;
     }
@@ -484,7 +594,7 @@ export function initSlide6() {
 
 
         // -------------------------------------------------
-        // Acceleration in basis directions
+        // Acceleration
         // -------------------------------------------------
 
         if (keys.up) {
@@ -536,7 +646,7 @@ export function initSlide6() {
 
 
         // -------------------------------------------------
-        // Calculate new position
+        // New position
         // -------------------------------------------------
 
         const newA =
@@ -605,12 +715,13 @@ export function initSlide6() {
             distance(
                 player,
                 goal
-            ) < 0.25
+            ) < getCellSize() * 0.25
         ) {
 
             finishCourse();
         }
     }
+
 
     function finishCourse() {
 
@@ -623,11 +734,19 @@ export function initSlide6() {
         velocityA = 0;
         velocityB = 0;
 
+
         courseTimeout =
             setTimeout(
                 () => {
 
                     courseTimeout = null;
+
+                    if (
+                        gridSize <
+                        MAX_GRID_SIZE
+                    ) {
+                        gridSize++;
+                    }
 
                     createCourse();
 
@@ -640,78 +759,80 @@ export function initSlide6() {
     // =================================================
     // DEADLY WALL COLLISION
     // =================================================
+    function wallOverlapsPlayer(wall, position) {
 
+        const half =
+            getCellSize() / 2;
+
+        const minX =
+            wall.x - half;
+
+        const maxX =
+            wall.x + half;
+
+        const minY =
+            wall.y - half;
+
+        const maxY =
+            wall.y + half;
+
+        const closestX =
+            Math.max(
+                minX,
+                Math.min(
+                    position.x,
+                    maxX
+                )
+            );
+
+        const closestY =
+            Math.max(
+                minY,
+                Math.min(
+                    position.y,
+                    maxY
+                )
+            );
+
+        const dx =
+            position.x -
+            closestX;
+
+        const dy =
+            position.y -
+            closestY;
+
+        return (
+            dx * dx +
+            dy * dy
+            <=
+            PLAYER_RADIUS *
+            PLAYER_RADIUS
+        );
+    }
     function isWallCollision(position) {
 
-        for (const wall of walls) {
+    for (const wall of walls) {
 
-            const half =
-                WALL_SIZE / 2;
-
-
-            const minX =
-                wall.x - half;
-
-            const maxX =
-                wall.x + half;
-
-            const minY =
-                wall.y - half;
-
-            const maxY =
-                wall.y + half;
-
-
-            const closestX =
-                Math.max(
-                    minX,
-                    Math.min(
-                        position.x,
-                        maxX
-                    )
-                );
-
-            const closestY =
-                Math.max(
-                    minY,
-                    Math.min(
-                        position.y,
-                        maxY
-                    )
-                );
-
-
-            const dx =
-                position.x -
-                closestX;
-
-            const dy =
-                position.y -
-                closestY;
-
-
-            if (
-                dx * dx +
-                dy * dy
-                <=
-                PLAYER_RADIUS *
-                PLAYER_RADIUS
-            ) {
-
-                return true;
-            }
+        if (
+            wallOverlapsPlayer(
+                wall,
+                position
+            )
+        ) {
+            return true;
         }
-
-
-        return false;
     }
+
+    return false;
+}
 
 
     // =================================================
     // DEATH / RESET
     // =================================================
 
-   function die() {
+    function die() {
 
         hitWall = true;
 
@@ -726,7 +847,10 @@ export function initSlide6() {
 
 
         if (deathTimeout !== null) {
-            clearTimeout(deathTimeout);
+
+            clearTimeout(
+                deathTimeout
+            );
         }
 
 
@@ -749,40 +873,29 @@ export function initSlide6() {
 
     function clampToBoard(position) {
 
-        const halfWidth =
-            coordinateCanvas.width /
-            coordinateCanvas.scale /
-            2;
-
-        const halfHeight =
-            coordinateCanvas.height /
-            coordinateCanvas.scale /
-            2;
+        const half =
+            BOARD_SIZE / 2;
 
 
-        const limitX =
-            halfWidth -
-            PLAYER_RADIUS;
-
-        const limitY =
-            halfHeight -
+        const limit =
+            half -
             PLAYER_RADIUS;
 
 
         return new Vector(
 
             Math.max(
-                -limitX,
+                -limit,
                 Math.min(
-                    limitX,
+                    limit,
                     position.x
                 )
             ),
 
             Math.max(
-                -limitY,
+                -limit,
                 Math.min(
-                    limitY,
+                    limit,
                     position.y
                 )
             )
@@ -838,20 +951,25 @@ export function initSlide6() {
     // DRAWING
     // =================================================
 
-    function draw() {
 
-        coordinateCanvas.drawGrid();
+   function draw() {
 
-        drawMaze();
+    const ctx =
+        coordinateCanvas.ctx;
 
-        drawBasisVectors();
+    ctx.clearRect(
+        0,
+        0,
+        ctx.canvas.width,
+        ctx.canvas.height
+    );
 
-        drawGoal();
-
-        drawPlayer();
-    }
-
-
+    drawMaze();
+    drawBoardBorder();
+    drawBasisVectors();
+    drawGoal();
+    drawPlayer();
+}
     function drawBasisVectors() {
 
         drawVector(
@@ -874,13 +992,44 @@ export function initSlide6() {
         );
     }
 
+    function drawBoardBorder() {
 
+        const ctx =
+            coordinateCanvas.ctx;
+
+        const topLeft =
+            coordinateCanvas.toScreen(
+                new Vector(
+                    -BOARD_SIZE / 2,
+                    BOARD_SIZE / 2
+                )
+            );
+
+        const bottomRight =
+            coordinateCanvas.toScreen(
+                new Vector(
+                    BOARD_SIZE / 2,
+                    -BOARD_SIZE / 2
+                )
+            );
+
+        ctx.strokeStyle = "#888";
+        ctx.lineWidth = 3;
+
+        ctx.strokeRect(
+            topLeft.x,
+            topLeft.y,
+            bottomRight.x - topLeft.x,
+            bottomRight.y - topLeft.y
+        );
+    }
     function drawMaze() {
 
         const ctx =
             coordinateCanvas.ctx;
 
         const cellSize =
+            getCellSize() *
             coordinateCanvas.scale;
 
 
@@ -892,7 +1041,10 @@ export function initSlide6() {
 
             const screen =
                 coordinateCanvas.toScreen(
-                    wall
+                    new Vector(
+                        wall.x,
+                        wall.y
+                    )
                 );
 
 
@@ -928,7 +1080,12 @@ export function initSlide6() {
         ctx.arc(
             screen.x,
             screen.y,
-            10,
+            Math.max(
+                6,
+                getCellSize() *
+                coordinateCanvas.scale *
+                0.15
+            ),
             0,
             Math.PI * 2
         );
@@ -972,6 +1129,7 @@ export function initSlide6() {
 
         ctx.fill();
     }
+    
 
 
     // =================================================

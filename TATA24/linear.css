@@ -423,6 +423,13 @@ vec {
     justify-content: center;
 }
 
+.maze-game .canvas-container {
+    width: min(70vh, 700px);
+    height: min(70vh, 700px);
+    max-width: 100%;
+    aspect-ratio: 1;
+}
+
 .canvas-container {
     position: relative;
 }
@@ -591,5 +598,115 @@ vec {
 
     .question {
         padding: 15px;
+    }
+}
+
+.portrait-warning {
+    display: none;
+}
+
+@media screen and (orientation: portrait) and (max-width: 900px) {
+    .portrait-warning {
+        position: fixed;
+        inset: 0;
+        z-index: 9999;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        background: #111;
+        color: #eee;
+
+        text-align: center;
+        padding: 30px;
+    }
+
+    .portrait-warning-content {
+        max-width: 400px;
+    }
+
+    .portrait-warning h2 {
+        margin-bottom: 15px;
+    }
+
+    .portrait-warning p {
+        margin-bottom: 20px;
+        line-height: 1.5;
+    }
+
+    .rotate-icon {
+        font-size: 60px;
+        margin-bottom: 20px;
+    }
+
+    #continue-portrait {
+        padding: 10px 20px;
+
+        color: #eee;
+        background: #222;
+
+        border: 1px solid #555;
+        border-radius: 6px;
+
+        font-size: 16px;
+        cursor: pointer;
+    }
+
+    #continue-portrait:hover {
+        background: #333;
+    }
+}
+
+.maze-controls {
+    display: none;
+}
+
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    .maze-game {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .maze-game .canvas-container {
+        width: min(65vh, 600px);
+        height: min(65vh, 600px);
+        flex-shrink: 0;
+    }
+
+    .maze-controls {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+        margin: 0;
+    }
+
+    .maze-controls-u,
+    .maze-controls-v {
+        display: flex;
+        gap: 8px;
+    }
+
+    .maze-controls button {
+        width: 50px;
+        height: 45px;
+
+        font-size: 24px;
+        color: #eee;
+        background: #222;
+
+        border: 1px solid #555;
+        border-radius: 8px;
+
+        touch-action: none;
+        user-select: none;
+    }
+
+    .maze-controls button:active {
+        background: #444;
     }
 }

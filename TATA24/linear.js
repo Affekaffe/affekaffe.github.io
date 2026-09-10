@@ -16,6 +16,30 @@ const totalSlides =
     slides.length;
 
 
+const portraitWarning =
+    document.getElementById("portrait-warning");
+
+const continuePortrait =
+    document.getElementById("continue-portrait");
+
+if (portraitWarning && continuePortrait) {
+
+    if (
+        localStorage.getItem("portrait-mode") === "allowed"
+    ) {
+        portraitWarning.style.display = "none";
+    }
+
+    continuePortrait.addEventListener("click", () => {
+        portraitWarning.style.display = "none";
+
+        localStorage.setItem(
+            "portrait-mode",
+            "allowed"
+        );
+    });
+}
+
 function showSlide(number) {
 
     currentSlide = number;
