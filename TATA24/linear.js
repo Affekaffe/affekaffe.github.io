@@ -127,31 +127,5 @@ progressDots.forEach(dot => {
 });
 
 
-document.addEventListener(
-    "keydown",
-    event => {
-
-        // Arrow keys belong to the game
-        // while slide 6 is active.
-        if (currentSlide === 6) {
-            return;
-        }
-
-        if (
-            event.key === "ArrowRight" &&
-            currentSlide < totalSlides
-        ) {
-            showSlide(currentSlide + 1);
-        }
-
-        if (
-            event.key === "ArrowLeft" &&
-            currentSlide > 1
-        ) {
-            showSlide(currentSlide - 1);
-        }
-    }
-);
-
 
 showSlide(1);

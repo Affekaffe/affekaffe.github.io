@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TATA24 Pass 1</title>
+
+    <link rel="stylesheet" href="../linear.css">
+</head>
+
+
+<body>
+
+<!--Landscape mode popup-->
+<div class="portrait-warning" id="portrait-warning">
+    <div class="portrait-warning-content">
+        <h2>Rotera din enhet</h2>
+
+        <p>
+            Webbplatsen är utformad för liggande läge.
+        </p>
+
+        <div class="rotate-icon">↻</div>
+
+        <button id="continue-portrait">
+            Jag vill inte
+        </button>
+    </div>
+</div>
+<div id="app">
+
+<!-- Header includes slide number and title-->
+    <header id="topbar">
+
+        <div id="course-title">
+             Mentorspass 2 ✌️
+        </div>
+
+        <div id="slide-number">
+            1 / 6
+        </div>
+
+    </header>
+    
+    <!--All slides are below-->
+
+    <main id="slides">
+
+
+        <!--Slide 1-->
+
+        <section class="slide active" data-slide="1">
+
+            <div class="slide-content">
+
+                <h1>Vektorprodukt</h1>
+
+                <div class="interactive">
+                    <div class="canvas-container">
+                        <canvas
+                            id="cross-canvas"
+                            class="linear-canvas">
+                        </canvas>
+                        <div class="vector-info">
+
+                            <div class="vector-row">
+
+                                <div class="vector-display">
+                                    <span class="vector-label">u =</span>
+
+                                    <span class="vector-bracket vector-left"></span>
+
+                                    <span class="vector-values">
+                                        <span id="cross-ux">0.0</span>
+                                        <span id="cross-uy">0.0</span>
+                                        <span id="cross-uz">0.0</span>
+                                    </span>
+
+                                    <span class="vector-bracket vector-right"></span>
+                                </div>
+
+
+                                <div class="vector-display">
+                                    <span class="vector-label">v =</span>
+
+                                    <span class="vector-bracket vector-left"></span>
+
+                                    <span class="vector-values">
+                                        <span id="cross-vx">0.0</span>
+                                        <span id="cross-vy">0.0</span>
+                                        <span id="cross-vz">0.0</span>
+                                    </span>
+
+                                    <span class="vector-bracket vector-right"></span>
+                                </div>
+
+                            </div>
+
+
+                            <div class="vector-display">
+
+                                <span class="vector-label">u × v =</span>
+
+                                <span class="vector-bracket vector-left"></span>
+
+                                <span class="vector-values">
+                                    <span>0.0</span>
+                                    <span>0.0</span>
+                                    <span id="cross-value">0.0</span>
+                                </span>
+
+                                <span class="vector-bracket vector-right"></span>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="description">
+
+                    <p>
+                        Vektorprodukten av två vektorer <b>u</b> och <b>v</b>, är en ny vektor <b>u</b> × <b>v</b> som:
+                    </p>
+                    <p>
+                        <br>
+                        1) Pekar ortogonalt mot både <b>u</b> och <b>v</b><br>
+                        2) Vars längd är densamma som arean på parallellogrammen <b>u</b> och <b>v</b> bildar.<br>
+                        3) Gör att {<b>u</b>, <b>v</b>, <b>u</b> × <b>v</b>} är höger-orienterade.
+                    </p>
+                    <p>
+                        <br>
+                        Du kan dra runt vektorerna ovan för att försäkra dig om att detta stämmer.
+                    </p>
+
+                </div> 
+
+                    
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift 1:
+                    </p>
+
+                    <p>
+                        Flytta vektorerna <b>u</b> och <b>v</b> så att de bildar en ON-bas i planet. 
+                        Det vill säga, så att de har längd 1 och är ortogonala.
+                        Vad blir <b>u</b> × <b>v</b>? 
+                    </p>
+
+
+                </div>
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift 2:
+                    </p>
+                    <p>
+                        Det finns många minnesregler för hur man räknar ut vektorprodukten. Det kan vara bra att lära sig en man tycker om.
+                        Om du inte redan har en minnesregel, kan du söka fram en på <a href="https://en.wikipedia.org/wiki/Internet">internet</a>.
+                    </p>
+                </div>
+            </div>
+
+        </section>
+        <!-- Slide 2 -->
+
+        <!-- Slide 2 -->
+
+        <section class="slide" data-slide="2">
+
+            <div class="slide-content">
+
+                <h1>Plan</h1>
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="plane-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+
+                        <!-- View controls -->
+
+                        <div class="plane-view-controls">
+
+                            <button
+                                id="plane-parameter-button"
+                                class="active">
+                                Parameterform
+                            </button>
+
+                            <button
+                                id="plane-normal-button">
+                                Normalform
+                            </button>
+
+                        </div>
+
+
+                        <!-- Information -->
+
+                        <div class="plane-info">
+
+                            <!-- Parameterform -->
+
+                            <div
+                                id="plane-parameter-info"
+                                class="plane-form">
+
+                                <h3>Parameterform</h3>
+
+                                <div class="formula">
+                                    x = p + su + tv
+                                </div>
+
+
+                                <!-- p -->
+
+                                <div class="vector-display">
+
+                                    <span class="vector-label">
+                                        p =
+                                    </span>
+
+                                    <span class="vector-bracket vector-left"></span>
+
+                                    <span class="vector-values">
+                                        <span id="plane-px">1.000</span>
+                                        <span id="plane-py">1.000</span>
+                                        <span id="plane-pz">1.000</span>
+                                    </span>
+
+                                    <span class="vector-bracket vector-right"></span>
+
+                                </div>
+
+
+                                <!-- u -->
+
+                                <div class="vector-display">
+
+                                    <span class="vector-label">
+                                        u =
+                                    </span>
+
+                                    <span class="vector-bracket vector-left"></span>
+
+                                    <span class="vector-values">
+                                        <span id="plane-ux">2.000</span>
+                                        <span id="plane-uy">0.000</span>
+                                        <span id="plane-uz">0.000</span>
+                                    </span>
+
+                                    <span class="vector-bracket vector-right"></span>
+
+                                </div>
+
+
+                                <!-- v -->
+
+                                <div class="vector-display">
+
+                                    <span class="vector-label">
+                                        v =
+                                    </span>
+
+                                    <span class="vector-bracket vector-left"></span>
+
+                                    <span class="vector-values">
+                                        <span id="plane-vx">0.000</span>
+                                        <span id="plane-vy">2.000</span>
+                                        <span id="plane-vz">1.000</span>
+                                    </span>
+
+                                    <span class="vector-bracket vector-right"></span>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Normalform -->
+
+                            <div
+                                id="plane-normal-info"
+                                class="plane-form"
+                                style="display: none;">
+
+                                <h3>Normalform</h3>
+
+                                <div class="formula">
+                                    n · (x − p) = 0
+                                </div>
+
+
+                                <!-- p -->
+
+                                <div class="vector-display">
+
+                                    <span class="vector-label">
+                                        p =
+                                    </span>
+
+                                    <span class="vector-bracket vector-left"></span>
+
+                                    <span class="vector-values">
+                                        <span id="plane-px-normal">1.000</span>
+                                        <span id="plane-py-normal">1.000</span>
+                                        <span id="plane-pz-normal">1.000</span>
+                                    </span>
+
+                                    <span class="vector-bracket vector-right"></span>
+
+                                </div>
+
+
+                                <!-- n -->
+
+                                <div class="vector-display">
+
+                                    <span class="vector-label">
+                                        n =
+                                    </span>
+
+                                    <span class="vector-bracket vector-left"></span>
+
+                                    <span class="vector-values">
+                                        <span id="plane-nx">0.000</span>
+                                        <span id="plane-ny">-2.000</span>
+                                        <span id="plane-nz">4.000</span>
+                                    </span>
+
+                                    <span class="vector-bracket vector-right"></span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="description">
+
+                    <p>
+                        Plan i rummet kan beskrivas på parameterform och normalform.
+                    </p>
+
+                    <p>
+                        I parameterform beskrivs planet:
+                    </p>
+
+                    <div class="equation">
+                        <b>x</b> = <b>p</b> + s<b>u</b> + t<b>v</b>
+                        &nbsp;&nbsp; s,t ∈ ℝ
+                    </div>
+
+                    <p>
+                        Man får alltså alla punkter <b>x</b> i planet genom att börja från vektorn <b>p</b> och
+                        lägga på alla vektorer som <b>u</b> och <b>v</b> spänner upp. 
+                        Detta är precis analogt med hur man beskriver en linje på parameterform, men nu krävs två vektorer för att
+                        få med båda frihetsgraderna hos ett plan.<br><br>
+                    </p>
+                    <p>
+                        I normalform beskrivs planet:
+                    </p>
+                    <div class="equation">
+                        <b>n</b> · (<b>x</b> − <b>p</b>) = 0
+                    </div>
+
+                    <p>
+                        På normalform söker vi alla vektorer vars skalärprodukt med normalvektorn är 0,
+                        det vill säga alla vektorer som är vinkelräta mot planet.
+                    </p>
+
+                </div>
+
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga 1:
+                    </p>
+
+                    <p>
+                        I båda formerna används en "förskjutningsvektor" <b>p</b>. 
+                        Den behövs när planet inte går igenom origo, alltså då det är förskjutet från origo.
+                        I parameterform adderar vi <b>p</b>. I normalform står den inbakad som <b>x</b>-<b>p</b>.
+                        Kan du förklara varför de ser ut som de gör i de olika fallen?
+                    </p>
+
+                </div>
+
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga 2:
+                    </p>
+
+                    <p>
+                        Anta att vi har ett plan på parameterform, det vill säga att vi vet <b>u</b>, <b>v</b> och <b>p</b>.
+                        Vi vill veta planet på normalform.
+                        Hur kan vi på ett smidigt sätt hitta en normal till planet med hjälp av vektorerna vi känner till?
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+        <section class="slide" data-slide="3">
+
+            <div class="slide-content">
+
+                <h1>Närmsta punkt</h1>
+
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="closest-point-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+
+                        <!-- Lambda slider -->
+
+                        <div class="lambda-control">
+
+                            <label for="lambda-slider">
+                                t
+                            </label>
+
+                            <input
+                                id="lambda-slider"
+                                type="range"
+                                min="-2"
+                                max="2"
+                                step="0.01"
+                                value="0.5"
+                            >
+
+                        </div>
+
+
+                        <!-- Vector information -->
+
+                        <div class="vector-info">
+
+
+                            <!-- p -->
+
+                            <div class="vector-display">
+
+                                <span class="vector-label">
+                                    p =
+                                </span>
+
+                                <span class="vector-bracket vector-left"></span>
+
+                                <span class="vector-values">
+
+                                    <span id="closest-px">
+                                        1.000
+                                    </span>
+
+                                    <span id="closest-py">
+                                        1.000
+                                    </span>
+
+                                    <span id="closest-pz">
+                                        1.000
+                                    </span>
+
+                                </span>
+
+                                <span class="vector-bracket vector-right"></span>
+
+                            </div>
+
+
+                            <!-- q -->
+
+                            <div class="vector-display">
+
+                                <span class="vector-label">
+                                    q =
+                                </span>
+
+                                <span class="vector-bracket vector-left"></span>
+
+                                <span class="vector-values">
+
+                                    <span id="closest-qx">
+                                        2.000
+                                    </span>
+
+                                    <span id="closest-qy">
+                                        −1.000
+                                    </span>
+
+                                    <span id="closest-qz">
+                                        3.000
+                                    </span>
+
+                                </span>
+
+                                <span class="vector-bracket vector-right"></span>
+
+                            </div>
+
+
+                            <!-- n -->
+
+                            <div class="vector-display">
+
+                                <span class="vector-label">
+                                    n =
+                                </span>
+
+                                <span class="vector-bracket vector-left"></span>
+
+                                <span class="vector-values">
+
+                                    <span id="closest-nx">
+                                        0.000
+                                    </span>
+
+                                    <span id="closest-ny">
+                                        -2.000
+                                    </span>
+
+                                    <span id="closest-nz">
+                                        4.000
+                                    </span>
+
+                                </span>
+
+                                <span class="vector-bracket vector-right"></span>
+
+                            </div>
+
+
+                            <!-- lambda -->
+
+                            <div class="equation">
+
+                                t =
+                                <span id="closest-lambda">
+                                    0.000
+                                </span>
+
+                            </div>
+
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="description">
+
+                    <p>
+                        Låt säga att vi har ett plan på normalform, och en punkt <b>q</b> som ligger utanför planet.
+                        Vi är också av någon anledning mycket intresserade av vilken punkt på planet som ligger närmast q.
+                    </p>
+
+                    <p>
+                       <br>Den kortaste vägen från en punkt till ett plan, är den som går vinkelrätt
+                        rakt på planet. Planets normalvektor går också vinkelrätt ut från planet, så de har samma riktning!
+                    </p>
+
+                    <p>
+                        <br>Så för att hitta den närmsta punkten, så börjar vi på <b>q</b> och går längs normalen <b>n</b> så att vi hamnar
+                        på en punkt på planet. Vi vill alltså hitta ett tal t, så att t<b>n</b> + <b>q</b> ligger i planet.
+                    </p>
+
+                </div>
+
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift: Hitta t ungefärligt.
+                    </p>
+
+                    <p>
+                        Dra i slidern för t tills punkten <b>q</b> + t<b>n</b> ligger i planet, och den blir grön.
+                    </p>
+                </div>
+
+
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift: Hitta t algebraiskt.
+                    </p>
+
+                    <p>
+                        Vi har planets vektorer <b>p</b> och <b>n</b> givna, samt vår punkt <b>q</b>. Vi vill att
+                        <b>x</b> = <b>q</b> + t<b>n</b>
+                        ska ligga i planet som ges av <b>p</b> och normalen <b>n</b>. Att en punkt ligger i planet innebär då att den löser ekvationen:
+                    </p>
+
+                    <div class="equation">
+                        <b>n</b> · (<b>x</b> − <b>p</b>) = 0
+                    </div>
+                    
+                    <p>
+                        Sätt in värden för <b>p</b>, <b>q</b> och <b>n</b> i ekvationen ovan och försök lösa den.
+                        Värdena får du från grafen längst upp på sidan.
+                    </p>
+                </div>
+
+
+            </div>
+
+        </section>
+        <section class="slide" data-slide="4">
+
+        <div class="slide-content">
+
+            <h1>Plane with holes</h1>
+
+            <div class="interactive">
+
+                <div class="maze-game">
+
+                    <div class="canvas-container">
+
+                        <div
+                            class="maze-overlay"
+                            id="maze-overlay">
+
+                            <button
+                                id="maze-start-button"
+                                class="maze-start-button">
+
+                                Starta spelet
+
+                            </button>
+
+                        </div>
+
+                        <canvas
+                            id="maze-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+                    </div>
+
+
+                    <div class="maze-controls">
+
+                        <div class="maze-controls-u">
+
+                            <button
+                                data-direction="up">
+                                ↑
+                            </button>
+
+                            <button
+                                data-direction="down">
+                                ↓
+                            </button>
+
+                        </div>
+
+
+                        <div class="maze-controls-v">
+
+                            <button
+                                data-direction="left">
+                                ←
+                            </button>
+
+                            <button
+                                data-direction="right">
+                                →
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <p>
+                    Det var ett riktigt okreativt namn på ett spel
+                </p>
+
+            </div>
+
+        </div>
+
+    </section>
+    </main>
+
+<!--Footer includes navigation buttons-->
+    <footer id="navigation">
+
+        <button
+            id="previous"
+            class="nav-button"
+        >
+            ← Back
+        </button>
+
+
+        <div id="progress">
+
+            <span class="progress-dot active"
+                  data-slide="1"></span>
+
+            <span class="progress-dot"
+                  data-slide="2"></span>
+
+            <span class="progress-dot"
+                  data-slide="3"></span>
+
+            <span class="progress-dot"
+                  data-slide="4"></span>
+
+        </div>
+
+
+        <button
+            id="next"
+            class="nav-button"
+        >
+            Next →
+        </button>
+
+    </footer>
+</div>
+
+<script src="../linear.js"></script>
+<script type="module" src="ex2/ex2.js"></script>
+
+</body>
+</html>

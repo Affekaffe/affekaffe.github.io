@@ -31,11 +31,9 @@ export function initSlide1() {
     // Student's line
     // --------------------------------------------------
 
-    // p is now a position vector
     let vectorU =
         new Vector(2, 0);
 
-    // v is the direction vector
     let vectorV =
         new Vector(0, 2);
 
@@ -71,7 +69,6 @@ export function initSlide1() {
     const targetLine =
         createTargetLine();
 
-
     let dragging = null;
 
 
@@ -82,7 +79,6 @@ export function initSlide1() {
     function draw() {
 
         coordinateCanvas.drawGrid();
-
 
         const studentLine =
             new Line(
@@ -109,7 +105,8 @@ export function initSlide1() {
             true
         );
 
-        // Position vector p
+
+        // Position vector u
         drawVector(
             coordinateCanvas,
             new Vector(0, 0),
@@ -159,7 +156,6 @@ export function initSlide1() {
         const success =
             line.coincidesWith(targetLine);
 
-
         const status =
             document.getElementById("success-message");
 
@@ -201,19 +197,15 @@ export function initSlide1() {
                 coordinateCanvas.pointerPosition(event);
 
 
-            // Tip of position vector p
             const pointScreen =
                 coordinateCanvas.toScreen(
                     vectorU
                 );
 
 
-            // Tip of direction vector v
             const tipScreen =
                 coordinateCanvas.toScreen(
-                    vectorU.add(
-                        vectorV
-                    )
+                    vectorU.add(vectorV)
                 );
 
 
@@ -270,18 +262,13 @@ export function initSlide1() {
                 );
 
 
-            // Move position vector p
+            // Move position vector u
             if (dragging === "point") {
 
                 vectorU =
                     new Vector(
-                        Math.round(
-                            position.x * 10
-                        ) / 10,
-
-                        Math.round(
-                            position.y * 10
-                        ) / 10
+                        Math.round(position.x * 10) / 10,
+                        Math.round(position.y * 10) / 10
                     );
 
 
@@ -291,13 +278,11 @@ export function initSlide1() {
                 vectorV =
                     new Vector(
                         Math.round(
-                            (position.x -
-                                vectorU.x) * 10
+                            (position.x - vectorU.x) * 10
                         ) / 10,
 
                         Math.round(
-                            (position.y -
-                                vectorU.y) * 10
+                            (position.y - vectorU.y) * 10
                         ) / 10
                     );
             }
@@ -314,9 +299,15 @@ export function initSlide1() {
 
             dragging = null;
 
-            canvasElement.releasePointerCapture(
-                event.pointerId
-            );
+            if (
+                canvasElement.hasPointerCapture(
+                    event.pointerId
+                )
+            ) {
+                canvasElement.releasePointerCapture(
+                    event.pointerId
+                );
+            }
         }
     );
 
