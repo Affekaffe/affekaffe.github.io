@@ -119,43 +119,29 @@ export function initSlide4() {
 
 
     controlButtons.forEach(button => {
+        const direction = button.dataset.direction;
 
-        const direction =
-            button.dataset.direction;
+        button.addEventListener("pointerdown", event => {
+            event.preventDefault();
 
-        button.addEventListener(
-            "pointerdown",
-            event => {
+            keys[direction] = true;
 
-                event.preventDefault();
+            button.setPointerCapture(event.pointerId);
+        });
 
-                keys[direction] = true;
-            }
-        );
+        button.addEventListener("pointerup", event => {
+            event.preventDefault();
 
-        button.addEventListener(
-            "pointerup",
-            event => {
+            keys[direction] = false;
+        });
 
-                event.preventDefault();
+        button.addEventListener("pointercancel", () => {
+            keys[direction] = false;
+        });
 
-                keys[direction] = false;
-            }
-        );
-
-        button.addEventListener(
-            "pointercancel",
-            () => {
-                keys[direction] = false;
-            }
-        );
-
-        button.addEventListener(
-            "pointerleave",
-            () => {
-                keys[direction] = false;
-            }
-        );
+        button.addEventListener("lostpointercapture", () => {
+            keys[direction] = false;
+        });
     });
 
 

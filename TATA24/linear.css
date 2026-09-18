@@ -694,13 +694,41 @@ vec {
 
 
 /* =========================================================
-   MAZE MOBILE CONTROLS
+   MAZE CONTROLS
    ========================================================= */
-
-.maze-controls {
-    display: none;
+.maze-game {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
 }
 
+.maze-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.maze-controls button {
+    width: 60px;
+    height: 60px;
+    padding: 0;
+    font-size: 22px;
+    border: 1px solid #555;
+    border-radius: 7px;
+    background: #222;
+    color: #eee;
+    cursor: pointer;
+    touch-action: manipulation;
+    user-select: none;
+}
+
+.maze-controls button:active {
+    background: #444;
+    transform: scale(0.95);
+}
 
 /* =========================================================
    PORTRAIT WARNING
