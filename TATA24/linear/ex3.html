@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="sv">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>TATA24 Pass 3</title>
+
+    <link rel="stylesheet" href="../linear.css">
+</head>
+
+
+<body>
+
+<!-- Landscape mode popup -->
+
+<div
+    class="portrait-warning"
+    id="portrait-warning">
+
+    <div class="portrait-warning-content">
+
+        <h2>Rotera din enhet</h2>
+
+        <p>
+            Webbplatsen är utformad för liggande läge.
+        </p>
+
+        <div class="rotate-icon">
+            ↻
+        </div>
+
+        <button id="continue-portrait">
+            Jag vill inte
+        </button>
+
+    </div>
+
+</div>
+
+
+<div id="app">
+
+
+    <!-- Header -->
+
+    <header id="topbar">
+
+        <div id="course-title">
+            Mentorspass 3
+        </div>
+
+        <div id="slide-number">
+            1 / 2
+        </div>
+
+    </header>
+
+
+    <!-- Slides -->
+
+    <main id="slides">
+
+
+        <!-- Slide 1 -->
+
+        <section
+            class="slide active"
+            data-slide="1">
+
+            <div class="slide-content">
+
+                <h1>Vektorrum</h1>
+
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="span-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+
+                        <!-- Vector information -->
+
+                        <div class="vector-info">
+
+
+                            <!-- u -->
+
+                            <div class="vector-display">
+
+                                <span class="vector-label">
+                                    u =
+                                </span>
+
+                                <span class="vector-bracket vector-left"></span>
+
+                                <span class="vector-values">
+
+                                    <span id="span-ux">
+                                        2.000
+                                    </span>
+
+                                    <span id="span-uy">
+                                        1.000
+                                    </span>
+
+                                    <span id="span-uz">
+                                        1.000
+                                    </span>
+
+                                </span>
+
+                                <span class="vector-bracket vector-right"></span>
+
+                            </div>
+
+
+                            <!-- v -->
+
+                            <div class="vector-display">
+
+                                <span class="vector-label">
+                                    v =
+                                </span>
+
+                                <span class="vector-bracket vector-left"></span>
+
+                                <span class="vector-values">
+
+                                    <span id="span-vx">
+                                        -1.000
+                                    </span>
+
+                                    <span id="span-vy">
+                                        2.000
+                                    </span>
+
+                                    <span id="span-vz">
+                                        1.000
+                                    </span>
+
+                                </span>
+
+                                <span class="vector-bracket vector-right"></span>
+
+                            </div>
+
+
+                            <!-- w -->
+
+                            <div class="vector-display">
+
+                                <span class="vector-label">
+                                    w =
+                                </span>
+
+                                <span class="vector-bracket vector-left"></span>
+
+                                <span class="vector-values">
+
+                                    <span id="span-wx">
+                                        1.000
+                                    </span>
+
+                                    <span id="span-wy">
+                                        3.000
+                                    </span>
+
+                                    <span id="span-wz">
+                                        2.000
+                                    </span>
+
+                                </span>
+
+                                <span class="vector-bracket vector-right"></span>
+
+                            </div>
+
+
+                            <div class="equation">
+
+                                <b>w</b> =
+                                <span id="span-c1-display">1.00</span><b>u</b>
+                                +
+                                <span id="span-c2-display">1.00</span><b>v</b>
+
+                            </div>
+
+
+                        </div>
+
+
+                        <!-- Sliders -->
+
+                        <div class="span-controls">
+
+
+                            <div class="span-control">
+
+                                <label for="span-c1">
+                                    c₁
+                                </label>
+
+                                <input
+                                    id="span-c1"
+                                    type="range"
+                                    min="-15"
+                                    max="15"
+                                    step="0.01"
+                                    value="1"
+                                >
+
+                            </div>
+
+
+                            <div class="span-control">
+
+                                <label for="span-c2">
+                                    c₂
+                                </label>
+
+                                <input
+                                    id="span-c2"
+                                    type="range"
+                                    min="-15"
+                                    max="15"
+                                    step="0.01"
+                                    value="1"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="description">
+
+                    <p>
+                        Ett vektorrum <b>V</b> är en mängd, vars element kallas vektorer, och som uppfyller att:
+                        <br>
+                        <i>
+                        Om u, v är vektorer i <b>V</b> så är
+                        c₁u + c₂v en vektor i <b>V</b>, där c₁,c₂</i> ∈ ℝ.
+                        
+                        <br>
+                        <br>
+                    </p>
+
+                    <p>
+                        För att förstå vad detta säger, kan vi betrakta två vektorer i tre dimensioner, så som u och v i bilden ovan.
+                        Dessa två vektorer ligger i ett plan. 
+                        <br> <br><i>
+                        1) Om vi skalar u med c₁, så ligger den fortfarande i planet.<br>
+                        2) Om vi adderar u med v, så ligger summan fortfarande i planet.</i>
+
+                        <br> <br>
+                        Oavsett vilka u, v vi väljer i planet, kommer deras linjärkombination <b>c₁u</b> + <b>c₂v</b> aldrig att kunna bli en vektor utanför planet.
+                        Därför är planet ett vektorrum.
+
+                    </p>
+
+                </div>
+
+
+                <!-- Task -->
+
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift 1:
+                    </p>
+
+                    <p>
+                        Ett vektorrum måste alltid innehålla en 0-vektor. Det vill säga
+                        den vektor du får om du skalar en vektor med c=0.
+                        Ett bra första test för att se om ett rum är ett vektorrum är därför att
+                        lista ut om de innehåller 0-vektorn.
+                        <br>
+                        Om det finns en 0-vektor, får man gå vidare och kolla att c₁u + c₂v ligger i 
+                        rummet för alla u,v i rummet. Isåfall är rummet ett vektorrum.
+                        <br>
+                        <br>
+                    </p>
+
+                    <p>
+                        a) Är planet {(x, y, z): x + 2y - 5 = z} ett vektorrum?<br>
+                        b) Är linjen {(x, y): y = 2x} ett vektorrum?<br>
+                        c) Är de reella talen ℝ ett vektorrum?
+                    </p>
+
+                </div>
+
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift 2:
+                    </p>
+
+                    <p>
+                        Det är inte bara "vanliga" vektorer som kan bilda vektorrum. Vi kan skapa ett rum av vad som helst
+                        som uppfyller villkoret att c₁u + c₂v ligger i V om u,v ligger i V. Ett viktigt exempel är polynom.
+                        <br><br>
+                        Om vi adderar två polynom, får vi ett polynom.
+                        <br>
+                        Om vi skalar ett polynom med ett reellt tal, får vi också ett polynom.
+                        <br><br>
+                        Alltså är mängden av alla polynom ett vektorrum.
+                        <br>
+                        <br>
+                        Kan du komma på något mer exempel? (Tänk: om vi lägger ihop två ___ så får vi en ny ___)
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+        
+
+    <!-- Slide 2 -->
+
+        <section
+            class="slide"
+            data-slide="2">
+
+            <div class="slide-content">
+
+                <h1>Linjärt hölje</h1>
+
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="span2-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+
+                        <!-- Slider -->
+
+                        <div class="span-controls">
+
+                            <div class="span-control">
+
+                                <label for="span2-u-angle">
+                                    u
+                                </label>
+
+                                <input
+                                    id="span2-u-angle"
+                                    type="range"
+                                    min="-45"
+                                    max="135"
+                                    step="1"
+                                    value="-45"
+                                >
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Equation -->
+
+                <div class="equation">
+
+                    [<b>u</b>, <b>v</b>]
+                    =
+                    {
+                    c₁<b>u</b> + c₂<b>v</b>
+                    :
+                    c₁,c₂ ∈ ℝ
+                    }
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="description">
+
+                    <p>
+                        Förut såg vi att ett vektorrum är mängden av alla linjärkombinationer av vektorer i rummet.
+                        <br>
+                        <br>
+                        Vi kan också tänka tvärt om: Om vi har t.ex. två vektorer, så kan vi skapa ett vektorrum genom att
+                        kolla på alla deras linjärkombinationer. Detta visualiseras i bilden ovan, där de två vektorernas linjärkombinationer bildar
+                        ett rum (t.ex. ett plan). 
+                    </p>
+
+                </div>
+
+
+                <!-- Task -->
+
+                <div class="question">
+
+                    <p class="discussion-label">
+                        Fråga:
+                    </p>
+
+                    <p>
+                        Om vi skapar ett rum med ett antal vektorer, säger vi att vektorerna "spänner upp" det rummet. 
+                        <br><br>
+                        Två vektorer i 3 dimensioner, u och v, spänner oftast upp ett plan. Det finns två
+                        specialfall när de inte spänner upp ett plan. Vilka då? (Ett av fallen kan hittas genom att dra i slidern ovan.)
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+       
+        <!-- Slide 3 -->
+
+        <section
+            class="slide"
+            data-slide="3">
+
+            <div class="slide-content">
+
+                <h1>Delrum</h1>
+
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="subspace-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Equation -->
+
+                <div class="equation">
+
+                    <b>U</b> ∩ <b>W</b>
+
+                </div>
+
+
+                <!-- Description -->
+
+                <div class="description">
+
+                    <p>
+                        Ibland kan vi ha ett vektorrum inuti ett annat vektorrum. Då säger vi ett det ena är ett <i>delrum</i> av det andra.
+                    </p>
+
+                    <p>
+                        <br>
+                        T.ex, En 3d-linje genom origo, är ett delrum av ℝ³:<br>
+                        En linje genom origo är ett vektorrum (enligt förra sidan), och alla punkter i linjen ligger också i ℝ³
+                    </p>
+
+                    <p>
+                        <br>
+                        Ett annat exempel är polynom:
+                        <br> 
+                        Mängden av alla andragradspolynom (ax² + bx + c), är ett delrum av
+                        alla tredjegradspolynom (ax³ + bx² + c + d).
+                        <br>
+                        Eftersom båda är vektorrum, och alla andragradspolynom är ett tredjegradspolynom där a=0.
+                        
+                    </p>
+
+                </div>
+
+
+                <!-- Task -->
+
+                <div class="task">
+
+                    <p class="discussion-label">
+                        Uppgift:
+                    </p>
+
+                    <p>
+                        I bilden ser vi två plan som skär varandra. Säg att båda planen går genom origo,
+                        så att de kan betraktas som vektorrum U och V, som är delrum till ℝ³.
+                        <br>
+                        <br>
+                        Linjen där de skär varandra, d.v.s de vektorer som finns i båda plan: U ∩ V, kommer då också bilda ett vektorrum.
+                        Detta ska bevisas för två generella delrum i en tentauppgift som <a href="https://ungkulturkraft.blogspot.com/2010/11/det-vinnande-bidraget-kommer-fran.html">Alfons</a> kommer gå genom senare. Men du kan förbereda dig genom att verifiera:
+                        <br>
+                        <br>
+                        1) Ligger 0-vektorn i linjen U ∩ V? <i>(D.v.s, finns (0,0,0) i både U och V)?</i>
+                        <br>
+                        2) Om vi har två vektorer i linjen, kommer då deras linjärkombination ligga i linjen? 
+                        <br>
+                        <i>(Om u, v är vektorer som ligger i U, ligger då au + bv i både U? <br> Om de ligger i V, ligger au + bv i V?)
+                        </i>
+                        
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+        
+<!-- Slide 4 -->
+
+        <section
+            class="slide"
+            data-slide="4">
+
+            <div class="slide-content">
+
+                <h1>Antimatter choco-splatter</h1>
+
+
+                <div class="interactive">
+
+                    <div class="canvas-container">
+
+                        <canvas
+                            id="chocolate-canvas"
+                            class="linear-canvas">
+                        </canvas>
+
+
+                        <!-- Game overlay -->
+
+                        <div
+                            id="chocolate-overlay"
+                            class="maze-overlay">
+
+                            <button
+                                id="chocolate-start"
+                                class="maze-start-button">
+
+                                Börja spela
+
+                            </button>
+
+                        </div>
+
+
+                        <!-- Game information -->
+
+                        <div
+                            id="chocolate-score"
+                            class="chocolate-score">
+
+                            Poäng: 0
+
+                        </div>
+
+
+                        <div
+                            id="chocolate-mass"
+                            class="chocolate-mass">
+
+                            Massa: 1
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Controls -->
+
+                <div class="chocolate-controls">
+
+                    <button
+                        id="chocolate-left"
+                        type="button"
+                        aria-label="Flytta vänster">
+
+                        ←
+
+                    </button>
+
+                    <button
+                        id="chocolate-right"
+                        type="button"
+                        aria-label="Flytta höger">
+
+                        →
+
+                    </button>
+
+                </div>
+
+
+                <!-- Equation -->
+
+                <div class="equation">
+
+                    choklad + choklad = choklad
+
+                    <br><br>
+
+                    choklad + (−choklad) = annihilation
+
+                </div>
+
+
+
+
+            </div>
+
+        </section>
+
+
+
+    </main>
+
+
+    <!-- Footer -->
+
+    <footer id="navigation">
+
+        <button
+            id="previous"
+            class="nav-button">
+
+            ← Back
+
+        </button>
+
+
+        <div id="progress">
+
+            <span
+                class="progress-dot active"
+                data-slide="1">
+            </span>
+
+            <span
+                class="progress-dot"
+                data-slide="2">
+            </span>
+
+            <span
+                class="progress-dot"
+                data-slide="3 ">
+            </span>
+
+            <span
+                class="progress-dot"
+                data-slide="4 ">
+            </span>
+
+        </div>
+
+
+        <button
+            id="next"
+            class="nav-button">
+
+            Next →
+
+        </button>
+
+    </footer>
+
+</div>
+
+
+<script src="../linear.js"></script>
+<script
+    type="module"
+    src="ex3/ex3.js">
+</script>
+
+</body>
+
+</html>

@@ -1,10 +1,10 @@
 export class Camera3D {
 
-    constructor(canvas, rotX = 0.55, rotZ = -0.7) {
+    constructor(canvas, rotX = 0.55, rotZ = -0.7, scale = 45) {
 
         this.canvas = canvas;
 
-        this.scale = 45;
+        this.scale = scale;
 
         this.rotationX = rotX;
         this.rotationZ = rotZ;
