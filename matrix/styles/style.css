@@ -2,12 +2,9 @@ html, body {
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background: #111;
+  background: #171f15;
 }
 
-/* =======================
-   Global Reset
-======================= */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -16,10 +13,6 @@ html, body {
 }
 
 
-
-/* =======================
-   App Container
-======================= */
 #app {
   display: flex;
   flex-direction: column;
@@ -28,17 +21,14 @@ html, body {
   touch-action: none;
 }
 
-/* =======================
-   Controls
-======================= */
 #controls {
   position: relative;
   display: flex;
   justify-content: space-around;
   align-items: center;
   padding: 10px;
-  background-color: #111111;
-  border-bottom: 1px solid #222222;
+  background-color: #420f0f;
+  border-bottom: 1px solid #0c4748;
   z-index: 10;
 }
 
@@ -100,15 +90,12 @@ html, body {
   width: 200px;
 }
 
-/* =======================
-   Canvas Container
-======================= */
 #canvas-container {
-  flex: 1; /* take remaining vertical space */
+  flex: 1; 
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #111111;
+  background-color: #1f524e;
   overflow: hidden;
 }
 
@@ -116,28 +103,28 @@ canvas#view {
   width: 100%;
   height: 100%;
   display: block;
-  background-color: #111111;
-  border: 1px solid #222222;
+  background-color: #1f524e;
+  border: 1px solid #020e00;
 }
 
 #settings-wrapper {
   position: absolute;
-  top: 10px;        /* distance from top of canvas/container */
-  right: 10px;      /* pinned to right */
+  top: 10px;       
+  right: 10px;      
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  z-index: 15;      /* above canvas and vector labels */
+  z-index: 15;    
 }
 
 #settings-panel {
-  margin-top: 5px;        /* space below button */
+  margin-top: 5px;       
   background: #222;
   border: 1px solid #555;
   padding: 8px 12px;
   border-radius: 8px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.3);
-  display: none;           /* hidden by default */
+  display: none;         
 }
 
 #settings-panel.show {
@@ -169,7 +156,7 @@ canvas#view {
   font-weight: bold;
   color: #cccccc;          
   background-color: green; 
-  border: 2px solid #111111;
+  border: 2px solid #1f524e;
   border-radius: 5px;
   padding: 6px 12px;
   cursor: pointer;
@@ -201,7 +188,7 @@ canvas#view {
 
 .matrix-button {
   width: auto;
-  color: #222222;
+  color: #2eee00;
   background-color: #cccccc;
 }
 
@@ -246,29 +233,28 @@ canvas#view {
 
 #canvas-container {
   position: relative;
-  flex: 1; /* keep existing behavior */
+  flex: 1;
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #111111;
+  background-color: #1f524e;
   overflow: hidden;
 }
 
-/* Make the labels overlay the canvas exactly */
 #vector-labels {
   position: absolute;
-  inset: 0;             /* top:0; right:0; bottom:0; left:0; */
+  inset: 0;            
   pointer-events: none; /* so clicks go to canvas */
   width: 100%;
   height: 100%;
 }
 
 #vector-coords {
-  position: absolute;      /* overlay relative to #controls */
-  top: 100%;               /* right below the matrix inputs */
-  left: 0;                 /* align to the left of #controls */
-  width: auto;             /* don’t stretch full width */
-  max-width: 200px;        /* optional, safety limit */
+  position: absolute;      
+  top: 100%;              
+  left: 0;                 
+  width: auto;            
+  max-width: 200px;       
   color: white;
   font-family: monospace;
   font-size: 14px;

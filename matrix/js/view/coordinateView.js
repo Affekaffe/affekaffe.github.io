@@ -83,7 +83,7 @@ class CoordinateView {
   draw() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.setBackgroundColor("#222");
+    this.setBackgroundColor("#12052c");
 
     this.drawGrid();
     this.drawVectors();
