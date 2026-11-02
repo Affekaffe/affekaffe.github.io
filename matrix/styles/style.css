@@ -27,7 +27,7 @@ html, body {
   justify-content: space-around;
   align-items: center;
   padding: 10px;
-  background-color: #420f0f;
+  background-color: #241e5d;
   border-bottom: 1px solid #0c4748;
   z-index: 10;
 }
@@ -119,7 +119,7 @@ canvas#view {
 
 #settings-panel {
   margin-top: 5px;       
-  background: #222;
+  background: #290f0f;
   border: 1px solid #555;
   padding: 8px 12px;
   border-radius: 8px;
@@ -188,7 +188,7 @@ canvas#view {
 
 .matrix-button {
   width: auto;
-  color: #2eee00;
+  color: #10280a;
   background-color: #cccccc;
 }
 
@@ -258,7 +258,7 @@ canvas#view {
   color: white;
   font-family: monospace;
   font-size: 14px;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(71, 39, 39, 0.4);
   padding: 10px;
   border-radius: 8px;
   margin-top: 10px;
